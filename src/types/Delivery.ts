@@ -1,0 +1,24 @@
+import Post from './Post';
+
+interface Delivery extends Post {
+    class_list: string[];
+    acf: {
+        sea_id: string;
+        zone_sea_id: string;
+        zone_id: string;
+        date: string;
+        sea_customer_code: string;
+        customer_id: string;
+        document: string;
+        article_count: number;
+        weighted_article_count: number;
+        qty: number;
+        weighted_qty: number;
+        is_prepared: boolean;
+        is_loaded: boolean;
+        is_delivered: boolean;
+        gallery: string[];
+    };
+}
+
+export default Delivery;

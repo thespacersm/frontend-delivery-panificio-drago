@@ -24,7 +24,11 @@ const Sidebar: React.FC<SidebarProps> = ({isOpen, toggleSidebar}) => {
             <div className="p-6">
                 <div className="flex justify-between items-center mb-8">
                     <div className="flex items-center">
-                        <FontAwesomeIcon icon={faTruck} className="mr-2 text-white"/>
+                        <img 
+                                src="/logo-white.svg" 
+                                alt="Panificio Drago Logo" 
+                                className="mr-2 h-12 w-12"
+                            />
                         <h2 className="text-xl font-bold">Panificio Drago</h2>
                     </div>
                     <button

@@ -9,7 +9,7 @@ import Customer from '@/types/Customer';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUtensils, faTruckLoading, faCheckCircle, faTimesCircle, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faUtensils, faTruckLoading, faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 const RoutesView: React.FC = () => {
     const { routeService, deliveryService, customerService } = useServices();

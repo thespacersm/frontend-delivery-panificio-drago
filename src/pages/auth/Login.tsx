@@ -30,13 +30,20 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-                <h1 className="text-2xl font-bold text-center text-gray-800">Login</h1>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4 py-16 pt-0">
+            <img 
+                src="/logo.svg" 
+                alt="Panificio Drago Logo" 
+                className="h-20 w-20 mb-4"
+            />
+            <div className="w-full max-w-md p-6 space-y-4 bg-white rounded shadow-md">
+                <div className="flex flex-col items-center justify-center">
+                    <h1 className="text-xl font-bold text-center text-gray-800">Login</h1>
+                </div>
                 <p className="text-sm text-center text-gray-600">Benvenuto! Effettua il login per continuare.</p>
 
                 {error && (
-                    <div className="p-3 text-sm text-red-700 bg-red-100 rounded-md">
+                    <div className="p-2 text-sm text-red-700 bg-red-100 rounded-md">
                         {error}
                     </div>
                 )}

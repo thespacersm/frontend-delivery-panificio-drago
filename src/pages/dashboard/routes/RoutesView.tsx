@@ -116,7 +116,7 @@ const RoutesView: React.FC = () => {
                             {deliveries.length > 0 ? (
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
+                                        <thead className="bg-gray-50 hidden md:table-header-group">
                                             <tr>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
@@ -132,15 +132,16 @@ const RoutesView: React.FC = () => {
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
+                                        <tbody className="bg-white divide-y divide-gray-200 block md:table-row-group">
                                             {deliveries.map((delivery) => {
                                                 const customer = customers[delivery.acf.customer_id];
                                                 const deliveryDate = new Date(delivery.acf.date);
                                                 const formattedDate = `${deliveryDate.getFullYear()}/${String(deliveryDate.getMonth() + 1).padStart(2, '0')}/${String(deliveryDate.getDate()).padStart(2, '0')}`;
                                                 
                                                 return (
-                                                    <tr key={delivery.id}>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                    <tr key={delivery.id} className="block md:table-row md:border-none mb-5 md:mb-0 bg-gray-50 md:bg-white px-3">
+                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap">
+                                                            <div className="md:hidden text-xs font-bold text-gray-500 uppercase mb-1">Cliente</div>
                                                             <div>
                                                                 <div className="text-sm font-medium text-gray-900">
                                                                     {customer ? customer.title.rendered : delivery.title.rendered}
@@ -152,29 +153,50 @@ const RoutesView: React.FC = () => {
                                                                 )}
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                            {formattedDate}
+                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap border-t border-gray-200 md:border-t-0">
+                                                            <div className="md:hidden text-xs font-bold text-gray-500 uppercase mb-1">Data</div>
+                                                            <div className="text-sm text-gray-500">
+                                                                {formattedDate}
+                                                            </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                            {delivery.acf.article_count}
+                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap border-t border-gray-200 md:border-t-0">
+                                                            <div className="md:hidden text-xs font-bold text-gray-500 uppercase mb-1">Articoli</div>
+                                                            <div className="text-sm text-gray-500">
+                                                                {delivery.acf.article_count}
+                                                            </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                            <FontAwesomeIcon 
-                                                                icon={delivery.acf.is_prepared ? faCheckCircle : faTimesCircle} 
-                                                                className={delivery.acf.is_prepared ? 'text-green-500' : 'text-gray-400'} 
-                                                            />
+                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap md:text-center border-t border-gray-200 md:border-t-0">
+                                                            <div className="flex md:justify-center items-center">
+                                                                <div className="md:hidden text-xs font-bold text-gray-500 uppercase mr-2">
+                                                                    <FontAwesomeIcon icon={faUtensils} className="mr-1" /> Preparata
+                                                                </div>
+                                                                <FontAwesomeIcon 
+                                                                    icon={delivery.acf.is_prepared ? faCheckCircle : faTimesCircle} 
+                                                                    className={delivery.acf.is_prepared ? 'text-green-500' : 'text-gray-400'} 
+                                                                />
+                                                            </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                            <FontAwesomeIcon 
-                                                                icon={delivery.acf.is_loaded ? faCheckCircle : faTimesCircle} 
-                                                                className={delivery.acf.is_loaded ? 'text-blue-500' : 'text-gray-400'} 
-                                                            />
+                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap md:text-center border-t border-gray-200 md:border-t-0">
+                                                            <div className="flex md:justify-center items-center">
+                                                                <div className="md:hidden text-xs font-bold text-gray-500 uppercase mr-2">
+                                                                    <FontAwesomeIcon icon={faTruckLoading} className="mr-1" /> Caricata
+                                                                </div>
+                                                                <FontAwesomeIcon 
+                                                                    icon={delivery.acf.is_loaded ? faCheckCircle : faTimesCircle} 
+                                                                    className={delivery.acf.is_loaded ? 'text-blue-500' : 'text-gray-400'} 
+                                                                />
+                                                            </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                            <FontAwesomeIcon 
-                                                                icon={delivery.acf.is_delivered ? faCheckCircle : faTimesCircle} 
-                                                                className={delivery.acf.is_delivered ? 'text-blue-500' : 'text-gray-400'} 
-                                                            />
+                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap md:text-center border-t border-gray-200 md:border-t-0">
+                                                            <div className="flex md:justify-center items-center">
+                                                                <div className="md:hidden text-xs font-bold text-gray-500 uppercase mr-2">
+                                                                    <FontAwesomeIcon icon={faCheckCircle} className="mr-1" /> Consegnata
+                                                                </div>
+                                                                <FontAwesomeIcon 
+                                                                    icon={delivery.acf.is_delivered ? faCheckCircle : faTimesCircle} 
+                                                                    className={delivery.acf.is_delivered ? 'text-blue-500' : 'text-gray-400'} 
+                                                                />
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 );

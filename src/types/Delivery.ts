@@ -17,7 +17,7 @@ interface Delivery extends Post {
         is_prepared: boolean;
         is_loaded: boolean;
         is_delivered: boolean;
-        gallery: string[];
+        gallery: number[];
     };
 }
 

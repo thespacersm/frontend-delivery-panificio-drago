@@ -33,6 +33,13 @@ export const acl = {
     
     // Permessi percorsi
     ROUTE_CREATE: "route:create",
+
+    // Permessi media
+    MEDIA_CREATE: "media:create",
+    MEDIA_READ: "media:read",
+    MEDIA_LIST: "media:list",
+    MEDIA_EDIT: "media:edit",
+    MEDIA_DELETE: "media:delete",
 }
 
 export const getAllPermissions = () => {
@@ -54,6 +61,8 @@ export const rolePermissions: Record<string, string[]> = {
         acl.DELIVERY_LOAD,
         acl.DELIVERY_DELIVER,
         acl.ROUTE_CREATE,
+        acl.MEDIA_LIST,
+        acl.MEDIA_READ,
     ],
     'administrator': getAllPermissions(),
     // Altri ruoli...

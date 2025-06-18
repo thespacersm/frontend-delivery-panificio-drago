@@ -8,6 +8,7 @@ import FlottaInCloudClient from './clients/FlottaInCloudClient';
 import RouteClient from './clients/RouteClient';
 import DeliveryClient from './clients/DeliveryClient';
 import WpClient from './clients/WpClient';
+import MediaClient from './clients/MediaClient';
 import AuthService from './services/AuthService';
 import UserService from './services/UserService';
 import VehicleService from './services/VehicleService';
@@ -16,6 +17,7 @@ import ZoneService from './services/ZoneService';
 import FlottaInCloudService from './services/FlottaInCloudService';
 import RouteService from './services/RouteService';
 import DeliveryService from './services/DeliveryService';
+import MediaService from './services/MediaService';
 
 // Create the context
 const ServicesContext = createContext<{
@@ -27,6 +29,7 @@ const ServicesContext = createContext<{
     flottaInCloudService: FlottaInCloudService;
     routeService: RouteService;
     deliveryService: DeliveryService;
+    mediaService: MediaService;
     wpClient: WpClient;
 } | null>(null);
 
@@ -47,6 +50,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({child
     const zoneClient = new ZoneClient(wpClient);
     const routeClient = new RouteClient(wpClient);
     const deliveryClient = new DeliveryClient(wpClient);
+    const mediaClient = new MediaClient(wpClient);
     const flottaInCloudClient = new FlottaInCloudClient(flottaInCloudBaseUrl, flottaInCloudUsername, flottaInCloudToken);
 
     const authService = new AuthService(authClient);
@@ -57,6 +61,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({child
     const flottaInCloudService = new FlottaInCloudService(flottaInCloudClient);
     const routeService = new RouteService(routeClient);
     const deliveryService = new DeliveryService(deliveryClient);
+    const mediaService = new MediaService(mediaClient);
 
     // Provide the services via context
     return (
@@ -69,6 +74,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({child
             flottaInCloudService,
             routeService,
             deliveryService,
+            mediaService,
             wpClient
         }}>
             {children}

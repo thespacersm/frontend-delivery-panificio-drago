@@ -295,6 +295,27 @@ class WpClient {
             throw error;
         }
     }
+
+    /**
+     * @async
+     * @function uploadFile
+     * Metodo per caricare un file media.
+     * @param {FormData} formData - I dati del file da caricare.
+     * @returns {Promise<AxiosResponse<T>>} - Una promise che risolve con la risposta del file caricato.
+     */
+    async uploadFile<T>(formData: FormData): Promise<AxiosResponse<T>> {
+        try {
+            return await this.client.post<T>('/wp-json/wp/v2/media', formData, {
+                headers: {
+                    ...this.getAuthHeader(),
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+        } catch (error) {
+            this.handleApiError(error);
+            throw error;
+        }
+    }
 }
 
 // Export the WpClient class

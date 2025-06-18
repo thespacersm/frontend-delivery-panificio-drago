@@ -6,15 +6,21 @@ import Loader from '@/components/dashboard/ui/Loader';
 import PageError from '@/components/dashboard/ui/PageError';
 import StatusToggle from '@/components/dashboard/deliveries/StatusToggle';
 import { useServices } from '@/servicesContext';
+import MediaGallery from '@/components/dashboard/media/MediaGallery';
+import Media from '@/types/Media';
 
 const DeliveriesView: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const { deliveryService, customerService } = useServices();
+    const { deliveryService, customerService, mediaService } = useServices();
     const [delivery, setDelivery] = useState<any>(null);
     const [customer, setCustomer] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [updatingField, setUpdatingField] = useState<string | null>(null);
+    const [media, setMedia] = useState<Media[]>([]);
+    const [loadingMedia, setLoadingMedia] = useState<boolean>(false);
+    const [mediaError, setMediaError] = useState<string | null>(null);
+    const [updatingGallery, setUpdatingGallery] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -43,6 +49,34 @@ const DeliveriesView: React.FC = () => {
         fetchData();
     }, [id]);
 
+    useEffect(() => {
+        const fetchMedia = async () => {
+            if (!delivery || !delivery.acf.gallery || delivery.acf.gallery.length === 0) {
+                setMedia([]);
+                return;
+            }
+            
+            try {
+                setLoadingMedia(true);
+                setMediaError(null);
+                
+                const mediaPromises = delivery.acf.gallery.map((mediaId: number) => 
+                    mediaService.getMediaItem(mediaId)
+                );
+                
+                const mediaResults = await Promise.all(mediaPromises);
+                setMedia(mediaResults);
+            } catch (err) {
+                setMediaError('Errore nel caricamento delle immagini');
+                console.error(err);
+            } finally {
+                setLoadingMedia(false);
+            }
+        };
+
+        fetchMedia();
+    }, [delivery]);
+
     const updateDeliveryStatus = async (field: string, value: boolean) => {
         if (!id || !delivery) return;
         
@@ -68,6 +102,43 @@ const DeliveriesView: React.FC = () => {
             console.error(err);
         } finally {
             setUpdatingField(null);
+        }
+    };
+
+    const handleMediaUpload = async (mediaId: number) => {
+        if (!id || !delivery) return;
+        
+        try {
+            setUpdatingGallery(true);
+            
+            // Crea un nuovo array di media IDs aggiungendo quello nuovo
+            const currentGallery = delivery.acf.gallery || [];
+            const updatedGallery = [...currentGallery, mediaId];
+            
+            // Crea una copia del delivery con la galleria aggiornata
+            const updatedDelivery = {
+                ...delivery,
+                acf: {
+                    ...delivery.acf,
+                    gallery: updatedGallery
+                }
+            };
+            
+            // Invia l'aggiornamento al server
+            await deliveryService.updateDelivery(parseInt(id), updatedDelivery);
+            
+            // Aggiorna lo stato locale
+            setDelivery(updatedDelivery);
+            
+            // Carica il nuovo media
+            const newMedia = await mediaService.getMediaItem(mediaId);
+            setMedia(prevMedia => [...prevMedia, newMedia]);
+            
+        } catch (err) {
+            setError(`Errore nell'aggiornamento della galleria: ${err instanceof Error ? err.message : 'Errore sconosciuto'}`);
+            console.error(err);
+        } finally {
+            setUpdatingGallery(false);
         }
     };
 
@@ -143,6 +214,23 @@ const DeliveriesView: React.FC = () => {
                             )}
                         </Card>
                     )}
+
+                    <Card>
+                        <h2 className="text-xl font-semibold mb-4">Media</h2>
+                        {updatingGallery ? (
+                            <div className="text-center py-4">
+                                <Loader message="Aggiornamento galleria..." />
+                            </div>
+                        ) : (
+                            <MediaGallery 
+                                media={media} 
+                                loading={loadingMedia} 
+                                error={mediaError}
+                                onUpload={handleMediaUpload}
+                                allowUpload={true}
+                            />
+                        )}
+                    </Card>
                 </div>
             ) : (
                 <PageError message="Nessuna consegna trovata" type="info" />

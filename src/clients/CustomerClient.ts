@@ -80,24 +80,33 @@ class CustomerClient {
      * @function getCustomersByIds
      * Recupera una lista di clienti dati gli ID.
      * @param {number[]} ids - Un array di ID dei clienti da recuperare.
-     * @returns {Promise<Customer[]>} - Una promise che risolve con un array di clienti.
+     * @param {number} [page] - Il numero di pagina.
+     * @param {number} [perPage] - Il numero di elementi per pagina.
+     * @param {string} [orderby] - Il campo per ordinare.
+     * @param {string} [order] - L'ordine (ascendente o discendente).
+     * @returns {Promise<CustomersResponse>} - Una promise che risolve con i clienti richiesti e le informazioni di paginazione.
      */
-    async getCustomersByIds(ids: number[]): Promise<Customer[]> {
+    async getCustomersByIds(
+        ids: number[],
+        page?: number,
+        perPage?: number,
+        orderby: string = "id",
+        order: string = "asc"
+    ): Promise<CustomersResponse> {
         const filters: RestFilter[] = [
             {
                 key: 'include',
                 value: ids.join(',')
             }
         ];
-        const response = await this.wpClient.getPosts<CustomersResponse>(
+        return await this.wpClient.getPosts<CustomersResponse>(
             this.postType,
-            1,
-            100,
-            "id",
-            "asc",
+            page || 1,
+            perPage || 100,
+            orderby,
+            order,
             filters
         ) as CustomersResponse;
-        return response.data;
     }
 
     /**

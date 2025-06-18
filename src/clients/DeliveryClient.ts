@@ -120,19 +120,36 @@ class DeliveryClient {
      * @param {number} [perPage] - Il numero di elementi per pagina.
      * @param {string} [orderby] - Il campo per ordinare.
      * @param {string} [order] - L'ordine (ascendente o discendente).
+     * @param {RestFilter[]} [additionalFilters] - Filtri aggiuntivi da applicare.
      * @returns {Promise<DeliveriesResponse>} - Una promise che risolve con la risposta delle consegne.
      */
     async getDeliveriesByZoneId(
-        zoneId: string
+        zoneId: string,
+        page?: number,
+        perPage?: number,
+        orderby?: string,
+        order?: string,
+        additionalFilters?: RestFilter[]
     ): Promise<DeliveriesResponse> {
-        const filters: RestFilter[] = [
+        const zoneFilter: RestFilter[] = [
             {
                 key: 'zone_id',
                 value: zoneId
             }
         ];
         
-        return await this.getDeliveries(1, 100, "id", "asc", filters);
+        // Combina il filtro della zona con i filtri aggiuntivi se presenti
+        const combinedFilters = additionalFilters 
+            ? [...zoneFilter, ...additionalFilters] 
+            : zoneFilter;
+        
+        return await this.getDeliveries(
+            page || 1, 
+            perPage || 100, 
+            orderby || "id", 
+            order || "asc", 
+            combinedFilters
+        );
     }
 }
 

@@ -21,6 +21,7 @@ import RoutesView from './pages/dashboard/routes/RoutesView';
 import DeliveriesIndex from './pages/dashboard/deliveries/DeliveriesIndex';
 import DeliveriesCreate from './pages/dashboard/deliveries/DeliveriesCreate';
 import DeliveriesEdit from './pages/dashboard/deliveries/DeliveriesEdit';
+import DeliveriesView from './pages/dashboard/deliveries/DeliveriesView';
 
 const AppRouter: React.FC = () => {
     return (
@@ -60,6 +61,7 @@ const AppRouter: React.FC = () => {
                     <Route path="deliveries" element={<DeliveriesIndex/>}/>
                     <Route path="deliveries/new" element={<DeliveriesCreate/>}/>
                     <Route path="deliveries/:id/edit" element={<DeliveriesEdit/>}/>
+                    <Route path="deliveries/:id/view" element={<DeliveriesView/>}/>
 
                     {/* Rotte percorsi */}
                     <Route path="routes/new" element={<RoutesCreate/>}/>

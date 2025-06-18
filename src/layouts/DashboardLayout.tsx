@@ -43,7 +43,7 @@ const DashboardLayout: React.FC = () => {
 
             <div className={`flex-1 flex flex-col transition-all relative ${sidebarOpen ? 'md:ml-64' : 'ml-0'}`}>
                 <Header toggleSidebar={toggleSidebar}/>
-                <main className="flex-1 overflow-y-auto py-6 px-4 sm:px-6 lg:px-8">
+                <main className="flex-1 overflow-y-auto py-6 px-4 sm:px-6 pb-26 lg:px-8">
                     <Outlet/>
                 </main>
                 

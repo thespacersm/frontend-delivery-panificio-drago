@@ -16,3 +16,8 @@
 .ka-paging-page-index, .ka-paging-size {
     border-radius: 5px !important;
 }
+
+.ka td.ka-cell:before {
+    top: 50% !important;
+    transform: translateY(-50%);
+}

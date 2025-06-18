@@ -49,15 +49,30 @@ class CustomerService {
         }
     }
 
-    async getCustomersByIds(ids: number[]): Promise<Customer[]> {
+    /**
+     * Recupera una lista di clienti dati gli ID con opzioni di paginazione e ordinamento.
+     * @param {number[]} ids - Un array di ID dei clienti da recuperare.
+     * @param {number} [page] - Il numero di pagina.
+     * @param {number} [perPage] - Il numero di elementi per pagina.
+     * @param {string} [orderby] - Il campo per ordinare.
+     * @param {string} [order] - L'ordine (ascendente o discendente).
+     * @returns {Promise<CustomersResponse>} - Una promise che risolve con i clienti richiesti e le informazioni di paginazione.
+     */
+    async getCustomersByIds(
+        ids: number[],
+        page?: number,
+        perPage?: number,
+        orderby?: string,
+        order?: string
+    ): Promise<CustomersResponse> {
         try {
-            let customers = await this.customerClient.getCustomersByIds(ids);
+            let response = await this.customerClient.getCustomersByIds(ids, page, perPage, orderby, order);
             // Decodifica i titoli HTML per tutti i clienti
-            customers = customers.map((customer) => {
+            response.data = response.data.map((customer) => {
                 customer.title.rendered = he.decode(customer.title.rendered);
                 return customer;
             });
-            return customers;
+            return response;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Errore durante il recupero dei clienti';
             console.error(errorMessage);

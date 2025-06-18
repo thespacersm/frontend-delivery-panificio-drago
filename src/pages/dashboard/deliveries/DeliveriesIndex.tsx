@@ -7,6 +7,8 @@ import DeleteAction from '@/components/dashboard/table/actions/DeleteAction';
 import {useServices} from '@/servicesContext.tsx';
 import {DataType} from 'ka-table/enums';
 import Can from '@/components/dashboard/permission/Can';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 
 const DeliveriesIndex: React.FC = () => {
     const {deliveryService} = useServices();
@@ -64,6 +66,13 @@ const DeliveriesIndex: React.FC = () => {
         }
     ];
 
+    const ViewAction = ({ row }: { row: any }) => (
+        <Link to={`/dashboard/deliveries/${row.id}/view`} className="text-blue-600 hover:text-blue-900 mr-2">
+            <FontAwesomeIcon icon={faEye} className="mr-1" />
+            Visualizza
+        </Link>
+    );
+
     return (
         <div>
             <PageHeader
@@ -85,6 +94,7 @@ const DeliveriesIndex: React.FC = () => {
                 filters={filterOptions}
                 refreshIndex={refreshIndex}
                 actions={[
+                    ({row}) => <ViewAction row={row} />,
                     ({row}) => <EditAction row={row} onEdit={handleEdit}/>,
                     ({row}) => <Can permission="delivery:delete">
                         <DeleteAction

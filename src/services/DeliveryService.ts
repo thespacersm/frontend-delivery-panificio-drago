@@ -76,10 +76,22 @@ class DeliveryService {
     }
 
     async getDeliveriesByZoneId(
-        zoneId: string
+        zoneId: string,
+        page?: number,
+        perPage?: number,
+        orderby?: string,
+        order?: string,
+        filters?: RestFilter[]
     ): Promise<DeliveriesResponse> {
         try {
-            let response = await this.deliveryClient.getDeliveriesByZoneId(zoneId);
+            let response = await this.deliveryClient.getDeliveriesByZoneId(
+                zoneId,
+                page,
+                perPage,
+                orderby,
+                order,
+                filters
+            );
             // parse with he decode all the data in the response
             response.data = response.data.map((delivery) => {
                 delivery.title.rendered = he.decode(delivery.title.rendered);

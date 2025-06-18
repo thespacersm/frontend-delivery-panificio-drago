@@ -4,57 +4,32 @@ import Loader from '@/components/dashboard/ui/Loader';
 import PageError from '@/components/dashboard/ui/PageError';
 import { useServices } from '@/servicesContext';
 import Route from '@/types/Route';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { DataType } from 'ka-table/enums';
+import KaTable from '@/components/dashboard/table/KaTable';
 import Delivery from '@/types/Delivery';
 import Customer from '@/types/Customer';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUtensils, faTruckLoading, faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faTimesCircle, faEye } from '@fortawesome/free-solid-svg-icons';
+
 
 const RoutesView: React.FC = () => {
     const { routeService, deliveryService, customerService } = useServices();
     const [route, setRoute] = useState<Route | null>(null);
-    const [deliveries, setDeliveries] = useState<Delivery[]>([]);
-    const [customers, setCustomers] = useState<{[key: string]: Customer}>({});
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const [refreshIndex, setRefreshIndex] = useState(0);
+
 
     useEffect(() => {
+        
         const fetchRouteData = async () => {
             try {
                 setLoading(true);
                 const routeData = await routeService.getActiveRoute();
-                setRoute(routeData);
-
-                // Carica le consegne associate alla zona della rotta
-                if (routeData?.acf?.zone_id) {
-                    const deliveriesResponse = await deliveryService.getDeliveriesByZoneId(routeData.acf.zone_id);
-                    setDeliveries(deliveriesResponse.data);
-                    
-                    // Raccogli tutti gli ID dei clienti unici
-                    const uniqueCustomerIds = [...new Set(
-                        deliveriesResponse.data
-                            .map(delivery => delivery.acf.customer_id)
-                            .filter(id => id)
-                            .map(id => parseInt(id))
-                    )];
-                    
-                    // Carica tutti i clienti in una sola chiamata
-                    if (uniqueCustomerIds.length > 0) {
-                        try {
-                            const customersArray = await customerService.getCustomersByIds(uniqueCustomerIds);
-                            const customerMap: {[key: string]: Customer} = {};
-                            customersArray.forEach(customer => {
-                                customerMap[customer.id.toString()] = customer;
-                            });
-                            setCustomers(customerMap);
-                        } catch (err) {
-                            console.error('Errore nel caricamento dei clienti:', err);
-                        }
-                    }
-                }
-                
+                setRoute(routeData);                
                 setError(null);
             } catch (err) {
                 setError('Errore nel caricamento dei dati della rotta');
@@ -65,7 +40,43 @@ const RoutesView: React.FC = () => {
         };
 
         fetchRouteData();
-    }, [routeService, deliveryService, customerService]);
+    }, []);
+
+    const fetchData = async (pageIndex: number, pageSize: number, orderBy: string, order: string, filters: any) => {
+        try {
+            const zoneId = route?.acf?.zone_id;
+            const response = await deliveryService.getDeliveriesByZoneId(zoneId!, pageIndex + 1, pageSize, orderBy, order, filters);
+            
+            const customerIds = response.data.map((delivery) => delivery.acf.customer_id as unknown as number);
+            const customersResponse = await customerService.getCustomersByIds(customerIds, 1, 100, 'id', 'asc');
+            
+
+            // setCustomers(customersResponse.data);
+
+            const parsedRows = response.data.map((delivery) => {
+                const customer = customersResponse.data.find((c: Customer) => c.id === Number(delivery.acf.customer_id));
+                return {
+                    id: delivery.id,
+                    customer: customer,
+                    title: customer ? customer.title.rendered : delivery.title.rendered,
+                    date: delivery.acf.date,
+                    is_prepared: delivery.acf.is_prepared,
+                    is_loaded: delivery.acf.is_loaded,
+                    is_delivered: delivery.acf.is_delivered
+                }
+            });
+
+            const parsedData = {
+                data: parsedRows,
+                totalPages: response.totalPages,
+            };
+            return parsedData;
+        } catch (error) {
+            console.error('Error fetching vehicles:', error);
+            throw error;
+        }
+    };
+
 
     const handleDeactivate = async () => {
         if (!route || !route.id) return;
@@ -80,6 +91,101 @@ const RoutesView: React.FC = () => {
             }
         }
     };
+
+    const ViewAction = ({ row }: { row: any }) => (
+        <Link to={`/dashboard/deliveries/${row.id}/view`} className="text-blue-600 hover:text-blue-900">
+            <FontAwesomeIcon icon={faEye} className="mr-1" />
+            Visualizza
+        </Link>
+    );
+
+    const columns = [
+        {key: 'id', title: 'ID', dataType: DataType.Number},
+        {key: 'title', title: 'Cliente', render: (value: any, row: any) => {
+            
+            return (
+                <div>
+                    <div className="text-sm font-medium text-gray-900">
+                        {row.customer ? row.customer.title.rendered : row.title.rendered}
+                    </div>
+                    {row.customer && (
+                        <div className="text-xs text-gray-500">
+                            {row.customer.acf.address_street}, {row.customer.acf.address_location}
+                        </div>
+                    )}
+                </div>
+            )  
+        }},
+        // is_prepared
+        {key: 'is_prepared', title: 'Preparata', width: 100, dataType: DataType.Boolean, render: (value: boolean) => (
+            <div className="flex justify-left">
+                <FontAwesomeIcon 
+                    icon={value ? faCheckCircle : faTimesCircle} 
+                    className={value ? 'text-green-500' : 'text-gray-400'} 
+                />
+            </div>
+        )},
+        
+        // is_loaded
+        {key: 'is_loaded', title: 'Caricata', width: 100, dataType: DataType.Boolean, render: (value: boolean) => (
+            <div className="flex justify-left">
+                <FontAwesomeIcon 
+                    icon={value ? faCheckCircle : faTimesCircle} 
+                    className={value ? 'text-green-500' : 'text-gray-400'} 
+                />
+            </div>
+        )},
+        // is_delivered
+        {key: 'is_delivered', title: 'Consegnata', width: 100, dataType: DataType.Boolean, render: (value: boolean) => (
+            <div className="flex justify-left">
+                <FontAwesomeIcon 
+                    icon={value ? faCheckCircle : faTimesCircle} 
+                    className={value ? 'text-green-500' : 'text-gray-400'} 
+                />
+            </div>
+        )},
+    ];
+    
+    // Definizione dei filtri disponibili per la tabella
+    const filterOptions = [
+        {
+            key: 'id',
+            title: 'ID',
+            type: 'number' as const
+        },
+        {
+            key: 'title',
+            title: 'Cliente',
+            type: 'text' as const
+        },
+        {
+            key: 'is_prepared',
+            title: 'Preparata',
+            type: 'select' as const,
+            options: [
+                { value: '1', label: 'Sì' },
+                { value: '0', label: 'No' }
+            ]
+        },
+        {
+            key: 'is_loaded',
+            title: 'Caricata',
+            type: 'select' as const,
+            options: [
+                { value: '1', label: 'Sì' },
+                { value: '0', label: 'No' }
+            ]
+        },
+        {
+            key: 'is_delivered',
+            title: 'Consegnata',
+            type: 'select' as const,
+            options: [
+                { value: '1', label: 'Sì' },
+                { value: '0', label: 'No' }
+            ]
+        }
+    ];
 
     return (
         <div>
@@ -110,105 +216,19 @@ const RoutesView: React.FC = () => {
                         </div>
                     </Card>
                     
-                    <Card>
-                        <div>
-                            <h2 className="text-xl font-semibold mb-4">Consegne della Zona ({deliveries.length})</h2>
-                            {deliveries.length > 0 ? (
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50 hidden md:table-header-group">
-                                            <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Articoli</th>
-                                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    <FontAwesomeIcon icon={faUtensils} className="mr-1" /> Preparata
-                                                </th>
-                                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    <FontAwesomeIcon icon={faTruckLoading} className="mr-1" /> Caricata
-                                                </th>
-                                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    <FontAwesomeIcon icon={faCheckCircle} className="mr-1" /> Consegnata
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200 block md:table-row-group">
-                                            {deliveries.map((delivery) => {
-                                                const customer = customers[delivery.acf.customer_id];
-                                                const deliveryDate = new Date(delivery.acf.date);
-                                                const formattedDate = `${deliveryDate.getFullYear()}/${String(deliveryDate.getMonth() + 1).padStart(2, '0')}/${String(deliveryDate.getDate()).padStart(2, '0')}`;
-                                                
-                                                return (
-                                                    <tr key={delivery.id} className="block md:table-row md:border-none mb-5 md:mb-0 bg-gray-50 md:bg-white px-3">
-                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap">
-                                                            <div className="md:hidden text-xs font-bold text-gray-500 uppercase mb-1">Cliente</div>
-                                                            <div>
-                                                                <div className="text-sm font-medium text-gray-900">
-                                                                    {customer ? customer.title.rendered : delivery.title.rendered}
-                                                                </div>
-                                                                {customer && (
-                                                                    <div className="text-xs text-gray-500">
-                                                                        {customer.acf.address_street}, {customer.acf.address_location}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap border-t border-gray-200 md:border-t-0">
-                                                            <div className="md:hidden text-xs font-bold text-gray-500 uppercase mb-1">Data</div>
-                                                            <div className="text-sm text-gray-500">
-                                                                {formattedDate}
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap border-t border-gray-200 md:border-t-0">
-                                                            <div className="md:hidden text-xs font-bold text-gray-500 uppercase mb-1">Articoli</div>
-                                                            <div className="text-sm text-gray-500">
-                                                                {delivery.acf.article_count}
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap md:text-center border-t border-gray-200 md:border-t-0">
-                                                            <div className="flex md:justify-center items-center">
-                                                                <div className="md:hidden text-xs font-bold text-gray-500 uppercase mr-2">
-                                                                    <FontAwesomeIcon icon={faUtensils} className="mr-1" /> Preparata
-                                                                </div>
-                                                                <FontAwesomeIcon 
-                                                                    icon={delivery.acf.is_prepared ? faCheckCircle : faTimesCircle} 
-                                                                    className={delivery.acf.is_prepared ? 'text-green-500' : 'text-gray-400'} 
-                                                                />
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap md:text-center border-t border-gray-200 md:border-t-0">
-                                                            <div className="flex md:justify-center items-center">
-                                                                <div className="md:hidden text-xs font-bold text-gray-500 uppercase mr-2">
-                                                                    <FontAwesomeIcon icon={faTruckLoading} className="mr-1" /> Caricata
-                                                                </div>
-                                                                <FontAwesomeIcon 
-                                                                    icon={delivery.acf.is_loaded ? faCheckCircle : faTimesCircle} 
-                                                                    className={delivery.acf.is_loaded ? 'text-blue-500' : 'text-gray-400'} 
-                                                                />
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-4 md:px-6 block md:table-cell md:whitespace-nowrap md:text-center border-t border-gray-200 md:border-t-0">
-                                                            <div className="flex md:justify-center items-center">
-                                                                <div className="md:hidden text-xs font-bold text-gray-500 uppercase mr-2">
-                                                                    <FontAwesomeIcon icon={faCheckCircle} className="mr-1" /> Consegnata
-                                                                </div>
-                                                                <FontAwesomeIcon 
-                                                                    icon={delivery.acf.is_delivered ? faCheckCircle : faTimesCircle} 
-                                                                    className={delivery.acf.is_delivered ? 'text-blue-500' : 'text-gray-400'} 
-                                                                />
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            ) : (
-                                <p className="text-gray-500">Nessuna consegna trovata per questa zona.</p>
-                            )}
-                        </div>
-                    </Card>
+                    <div>
+                    <KaTable
+                        columns={columns}
+                        fetchData={fetchData}
+                        rowKeyField="id"
+                        filters={filterOptions}
+                        refreshIndex={refreshIndex}
+                        actions={[
+                            ({row}) => <ViewAction row={row} />,
+                        ]}
+                    />
+
+                    </div>
                 </div>
             ) : (
                 <PageError message="Nessuna rotta attiva trovata" type="info" />

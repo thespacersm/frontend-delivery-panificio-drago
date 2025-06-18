@@ -1,5 +1,6 @@
 import DeliveryClient, {DeliveriesResponse} from '@/clients/DeliveryClient';
 import Delivery from '@/types/Delivery';
+import DeliveryPdfResponse from '@/types/DeliveryPdfResponse';
 import he from 'he';
 import RestFilter from '@/types/RestFilter';
 
@@ -101,6 +102,16 @@ class DeliveryService {
             return response;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : `Errore durante il recupero delle consegne per la zona ${zoneId}`;
+            console.error(errorMessage);
+            throw error;
+        }
+    }
+
+    async generateDeliveryPdf(id: number): Promise<DeliveryPdfResponse> {
+        try {
+            return await this.deliveryClient.generateDeliveryPdf(id);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : `Errore durante la generazione del PDF per la consegna con ID ${id}`;
             console.error(errorMessage);
             throw error;
         }

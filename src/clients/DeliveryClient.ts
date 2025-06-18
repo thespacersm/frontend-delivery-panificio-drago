@@ -1,6 +1,7 @@
 import RestFilter from '@/types/RestFilter';
 import WpClient from './WpClient';
 import Delivery from '@/types/Delivery';
+import DeliveryPdfResponse from '@/types/DeliveryPdfResponse';
 
 export interface DeliveriesResponse {
     data: Delivery[];
@@ -150,6 +151,18 @@ class DeliveryClient {
             order || "asc", 
             combinedFilters
         );
+    }
+
+    /**
+     * @async
+     * @function generateDeliveryPdf
+     * Genera un PDF per una consegna specifica.
+     * @param {number} id - L'ID della consegna.
+     * @returns {Promise<DeliveryPdfResponse>} - Una promise che risolve con la risposta della generazione del PDF.
+     */
+    async generateDeliveryPdf(id: number): Promise<DeliveryPdfResponse> {
+        const response = await this.wpClient.get<DeliveryPdfResponse>(`/wp-json/seasistemi/v1/pdf/delivery/${id}`);
+        return response.data;
     }
 }
 

@@ -8,7 +8,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { DataType } from 'ka-table/enums';
 import KaTable from '@/components/dashboard/table/KaTable';
-import Delivery from '@/types/Delivery';
 import Customer from '@/types/Customer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faTimesCircle, faEye } from '@fortawesome/free-solid-svg-icons';
@@ -20,7 +19,7 @@ const RoutesView: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const [refreshIndex, setRefreshIndex] = useState(0);
+    const [refreshIndex, _setRefreshIndex] = useState(0);
 
 
     useEffect(() => {
@@ -101,7 +100,7 @@ const RoutesView: React.FC = () => {
 
     const columns = [
         {key: 'id', title: 'ID', dataType: DataType.Number},
-        {key: 'title', title: 'Cliente', render: (value: any, row: any) => {
+        {key: 'title', title: 'Cliente', render: (_value: any, row: any) => {
             
             return (
                 <div>

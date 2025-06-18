@@ -6,8 +6,6 @@ import Loader from '@/components/dashboard/ui/Loader';
 import PageError from '@/components/dashboard/ui/PageError';
 import StatusToggle from '@/components/dashboard/deliveries/StatusToggle';
 import { useServices } from '@/servicesContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 const DeliveriesView: React.FC = () => {
     const { id } = useParams<{ id: string }>();

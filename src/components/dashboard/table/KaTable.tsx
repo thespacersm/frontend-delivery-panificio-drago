@@ -20,7 +20,7 @@ interface KaTableProps<T> {
         title: string;
         render?: (value: any, row: T) => React.ReactNode; // Funzione di rendering personalizzata
         [key: string]: any;
-    }>;
+    }> & { render?: (value: any, row: T) => React.ReactNode };
     rowKeyField: string;
     actions?: Array<(props: { row: T }) => React.ReactNode>;
     filters?: Filter[];
@@ -175,9 +175,11 @@ const KaTable = <T extends object>({
                                 }
                                 
                                 // Gestisce il rendering personalizzato se la colonna ha una funzione render
-                                if (props.column.render) {
+                                if ('render' in props.column && props.column.render) {
                                     const value = props.value;
-                                    return props.column.render(value, props.rowData);
+                                    return typeof props.column.render === 'function'
+                                        ? props.column.render(value, props.rowData)
+                                        : undefined;
                                 }
                                 
                                 // Altrimenti lascia che ka-table gestisca il rendering predefinito

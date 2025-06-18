@@ -18,6 +18,7 @@ interface KaTableProps<T> {
     columns: Array<{
         key: string;
         title: string;
+        render?: (value: any, row: T) => React.ReactNode; // Funzione di rendering personalizzata
         [key: string]: any;
     }>;
     rowKeyField: string;
@@ -172,6 +173,15 @@ const KaTable = <T extends object>({
                                 if (props.column.key === 'actions') {
                                     return <ActionsCell rowData={props.rowData}/>;
                                 }
+                                
+                                // Gestisce il rendering personalizzato se la colonna ha una funzione render
+                                if (props.column.render) {
+                                    const value = props.value;
+                                    return props.column.render(value, props.rowData);
+                                }
+                                
+                                // Altrimenti lascia che ka-table gestisca il rendering predefinito
+                                return undefined;
                             }
                         },
                         cell: {

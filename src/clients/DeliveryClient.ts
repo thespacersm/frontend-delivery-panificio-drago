@@ -164,6 +164,47 @@ class DeliveryClient {
         const response = await this.wpClient.get<DeliveryPdfResponse>(`/wp-json/seasistemi/v1/pdf/delivery/${id}`);
         return response.data;
     }
+
+    /**
+     * @async
+     * @function getDeliveriesByRouteId
+     * Recupera le consegne associate a una specifica rotta.
+     * @param {string} routeId - L'ID della rotta.
+     * @param {number} [page] - Il numero di pagina.
+     * @param {number} [perPage] - Il numero di elementi per pagina.
+     * @param {string} [orderby] - Il campo per ordinare.
+     * @param {string} [order] - L'ordine (ascendente o discendente).
+     * @param {RestFilter[]} [additionalFilters] - Filtri aggiuntivi da applicare.
+     * @returns {Promise<DeliveriesResponse>} - Una promise che risolve con la risposta delle consegne.
+     */
+    async getDeliveriesByRouteId(
+        routeId: string,
+        page?: number,
+        perPage?: number,
+        orderby?: string,
+        order?: string,
+        additionalFilters?: RestFilter[]
+    ): Promise<DeliveriesResponse> {
+        const routeFilter: RestFilter[] = [
+            {
+                key: 'route_id',
+                value: routeId
+            }
+        ];
+        
+        // Combina il filtro della rotta con i filtri aggiuntivi se presenti
+        const combinedFilters = additionalFilters 
+            ? [...routeFilter, ...additionalFilters] 
+            : routeFilter;
+        
+        return await this.getDeliveries(
+            page || 1, 
+            perPage || 100, 
+            orderby || "id", 
+            order || "asc", 
+            combinedFilters
+        );
+    }
 }
 
 export default DeliveryClient;

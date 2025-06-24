@@ -43,8 +43,12 @@ const RoutesView: React.FC = () => {
 
     const fetchData = async (pageIndex: number, pageSize: number, orderBy: string, order: string, filters: any) => {
         try {
-            const zoneId = route?.acf?.zone_id;
-            const response = await deliveryService.getDeliveriesByZoneId(zoneId!, pageIndex + 1, pageSize, orderBy, order, filters);
+            const routeId = route?.id?.toString();
+            if (!routeId) {
+                throw new Error('ID della rotta non disponibile');
+            }
+            
+            const response = await deliveryService.getDeliveriesByRouteId(routeId, pageIndex + 1, pageSize, orderBy, order, filters);
             
             const customerIds = response.data.map((delivery) => delivery.acf.customer_id as unknown as number);
             const customersResponse = await customerService.getCustomersByIds(customerIds, 1, 100, 'id', 'asc');
@@ -71,7 +75,7 @@ const RoutesView: React.FC = () => {
             };
             return parsedData;
         } catch (error) {
-            console.error('Error fetching vehicles:', error);
+            console.error('Error fetching deliveries:', error);
             throw error;
         }
     };

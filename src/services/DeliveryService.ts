@@ -107,6 +107,37 @@ class DeliveryService {
         }
     }
 
+    async getDeliveriesByRouteId(
+        routeId: string,
+        page?: number,
+        perPage?: number,
+        orderby?: string,
+        order?: string,
+        filters?: RestFilter[]
+    ): Promise<DeliveriesResponse> {
+        try {
+            let response = await this.deliveryClient.getDeliveriesByRouteId(
+                routeId,
+                page,
+                perPage,
+                orderby,
+                order,
+                filters
+            );
+            // parse with he decode all the data in the response
+            response.data = response.data.map((delivery) => {
+                delivery.title.rendered = he.decode(delivery.title.rendered);
+                return delivery;
+            });
+
+            return response;
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : `Errore durante il recupero delle consegne per la rotta ${routeId}`;
+            console.error(errorMessage);
+            throw error;
+        }
+    }
+
     async generateDeliveryPdf(id: number): Promise<DeliveryPdfResponse> {
         try {
             return await this.deliveryClient.generateDeliveryPdf(id);

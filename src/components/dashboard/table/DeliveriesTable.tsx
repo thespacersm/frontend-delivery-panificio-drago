@@ -54,7 +54,10 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                     date: delivery.acf.date,
                     is_prepared: delivery.acf.is_prepared,
                     is_loaded: delivery.acf.is_loaded,
-                    is_delivered: delivery.acf.is_delivered
+                    is_delivered: delivery.acf.is_delivered,
+                    is_prepared_date: delivery.acf.is_prepared_date,
+                    is_loaded_date: delivery.acf.is_loaded_date,
+                    is_delivered_date: delivery.acf.is_delivered_date
                 }
             });
 
@@ -110,33 +113,60 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
             }
         },
         {
-            key: 'is_prepared', title: 'Preparata', width: 100, dataType: DataType.Boolean, render: (value: boolean) => (
-                <div className="flex justify-left">
-                    <FontAwesomeIcon
-                        icon={value ? faCheckCircle : faTimesCircle}
-                        className={value ? 'text-green-500' : 'text-gray-400'}
-                    />
-                </div>
+            key: 'is_prepared', title: 'Preparata', width: 120, dataType: DataType.Boolean, render: (value: boolean) => (
+                <FontAwesomeIcon
+                    icon={value ? faCheckCircle : faTimesCircle}
+                    className={value ? 'text-green-500' : 'text-gray-400'}
+                />
             )
         },
         {
-            key: 'is_loaded', title: 'Caricata', width: 100, dataType: DataType.Boolean, render: (value: boolean) => (
-                <div className="flex justify-left">
-                    <FontAwesomeIcon
-                        icon={value ? faCheckCircle : faTimesCircle}
-                        className={value ? 'text-green-500' : 'text-gray-400'}
-                    />
-                </div>
+            key: 'is_prepared_date', title: 'Data Preparazione', width: 150, render: (value: string) => (
+                value ? (
+                    <div className="text-sm">
+                        {new Date(value).toLocaleDateString('it-IT')}
+                    </div>
+                ) : (
+                    <span className="text-gray-400">-</span>
+                )
             )
         },
         {
-            key: 'is_delivered', title: 'Consegnata', width: 100, dataType: DataType.Boolean, render: (value: boolean) => (
-                <div className="flex justify-left">
-                    <FontAwesomeIcon
-                        icon={value ? faCheckCircle : faTimesCircle}
-                        className={value ? 'text-green-500' : 'text-gray-400'}
-                    />
-                </div>
+            key: 'is_loaded', title: 'Caricata', width: 120, dataType: DataType.Boolean, render: (value: boolean) => (
+                <FontAwesomeIcon
+                    icon={value ? faCheckCircle : faTimesCircle}
+                    className={value ? 'text-green-500' : 'text-gray-400'}
+                />
+            )
+        },
+        {
+            key: 'is_loaded_date', title: 'Data Caricamento', width: 150, render: (value: string) => (
+                value ? (
+                    <div className="text-sm">
+                        {new Date(value).toLocaleDateString('it-IT')}
+                    </div>
+                ) : (
+                    <span className="text-gray-400">-</span>
+                )
+            )
+        },
+        {
+            key: 'is_delivered', title: 'Consegnata', width: 120, dataType: DataType.Boolean, render: (value: boolean) => (
+                <FontAwesomeIcon
+                    icon={value ? faCheckCircle : faTimesCircle}
+                    className={value ? 'text-green-500' : 'text-gray-400'}
+                />
+            )
+        },
+        {
+            key: 'is_delivered_date', title: 'Data Consegna', width: 150, render: (value: string) => (
+                value ? (
+                    <div className="text-sm">
+                        {new Date(value).toLocaleDateString('it-IT')}
+                    </div>
+                ) : (
+                    <span className="text-gray-400">-</span>
+                )
             )
         },
     ];
@@ -162,6 +192,11 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
             ]
         },
         {
+            key: 'is_prepared_date',
+            title: 'Data Preparazione',
+            type: 'daterange' as const
+        },
+        {
             key: 'is_loaded',
             title: 'Caricata',
             type: 'select' as const,
@@ -171,6 +206,11 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
             ]
         },
         {
+            key: 'is_loaded_date',
+            title: 'Data Caricamento',
+            type: 'daterange' as const
+        },
+        {
             key: 'is_delivered',
             title: 'Consegnata',
             type: 'select' as const,
@@ -178,6 +218,11 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                 { value: '1', label: 'Sì' },
                 { value: '0', label: 'No' }
             ]
+        },
+        {
+            key: 'is_delivered_date',
+            title: 'Data Consegna',
+            type: 'daterange' as const
         }
     ];
 

@@ -3,10 +3,11 @@ import NumberFilter from './NumberFilter';
 import TextFilter from './TextFilter';
 import SelectFilter from './SelectFilter';
 import DateFilter from './DateFilter';
+import DateRangeFilter from './DateRangeFilter';
 import SelectedFilters from './selected/SelectedFilters';
 import RestFilter from '@/types/RestFilter';
 
-export type FilterType = 'text' | 'number' | 'select' | 'date';
+export type FilterType = 'text' | 'number' | 'select' | 'date' | 'daterange';
 
 export interface Filter {
     key: string;
@@ -40,24 +41,37 @@ const Filters: React.FC<FiltersProps> = ({
             // Rimuovi il filtro esistente se presente
             const updatedFilters = current.filter(f => f.key !== key);
 
+
             // Aggiungi il nuovo filtro se il valore non è vuoto
             if (value !== '' && value !== null && value !== undefined) {
                 const filterItem = filters.find(f => f.key === key);
-                // Imposta l'operatore in base al tipo di filtro
-                // const operator = filterOption?.type === 'text' ? 'contains' : '=';
-                const compare = filterItem?.type === 'text' ? 'LIKE' : '=';
+                
+                // Gestione speciale per daterange
+                if (filterItem?.type === 'daterange') {
 
-                let type = ''
-                if (filterItem?.type === 'text') {
-                    type = 'CHAR'
-                } else if (filterItem?.type === 'number') {
-                    type = 'NUMERIC'
+                    console.log('Daterange filter value:', value);
+                    const newFilter = {
+                        key,
+                        value,
+                        compare: 'BETWEEN',
+                        type: 'DATE'
+                    } as RestFilter;
+
+                    console.log('New daterange filter:', newFilter);
+
+                    updatedFilters.push(newFilter);
+                } else {
+                    const compare = filterItem?.type === 'text' ? 'LIKE' : '=';
+                    let type = ''
+                    if (filterItem?.type === 'text') {
+                        type = 'CHAR'
+                    } else if (filterItem?.type === 'number') {
+                        type = 'NUMERIC'
+                    }
+
+                    const newFilter = {key, value, compare, type} as RestFilter;
+                    updatedFilters.push(newFilter);
                 }
-
-
-                const newFilter = {key, value, compare, type} as RestFilter;
-
-                updatedFilters.push(newFilter);
             }
 
             return updatedFilters;
@@ -124,6 +138,16 @@ const Filters: React.FC<FiltersProps> = ({
                                     filterKey={filter.key}
                                     title={filter.title}
                                     value={currentValue}
+                                    onChange={handleFilterUpdate}
+                                />
+                            );
+                        case 'daterange':
+                            return (
+                                <DateRangeFilter
+                                    key={filter.key}
+                                    filterKey={filter.key}
+                                    title={filter.title}
+                                    value={currentValue || ""}
                                     onChange={handleFilterUpdate}
                                 />
                             );

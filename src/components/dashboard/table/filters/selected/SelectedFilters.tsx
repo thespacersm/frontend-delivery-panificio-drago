@@ -30,6 +30,21 @@ const SelectedFilters: React.FC<SelectedFiltersProps> = ({
             }
         }
 
+        if (filterItem.type === 'daterange' && typeof filter.value === 'object') {
+            const parts = [];
+            if (filter.value.from) {
+                parts.push(`da ${new Date(filter.value.from).toLocaleDateString('it-IT')}`);
+            }
+            if (filter.value.to) {
+                parts.push(`a ${new Date(filter.value.to).toLocaleDateString('it-IT')}`);
+            }
+            valueLabel = parts.join(' ');
+        }
+
+        if (filterItem.type === 'date') {
+            valueLabel = new Date(filter.value).toLocaleDateString('it-IT');
+        }
+
         return `${filterItem.title}: ${valueLabel}`;
     };
 

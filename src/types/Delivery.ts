@@ -17,6 +17,9 @@ interface Delivery extends Post {
         is_prepared: boolean;
         is_loaded: boolean;
         is_delivered: boolean;
+        is_prepared_date?: string;
+        is_loaded_date?: string;
+        is_delivered_date?: string;
         gallery: number[];
     };
 }

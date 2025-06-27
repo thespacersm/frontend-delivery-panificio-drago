@@ -226,6 +226,8 @@ const RoutesView: React.FC = () => {
                         rowKeyField="id"
                         filters={filterOptions}
                         refreshIndex={refreshIndex}
+                        pageSizes={[5, 10, 20, 50, 100]}
+                        defaultPageSize={100}
                         actions={[
                             ({row}) => <ViewAction row={row} />,
                         ]}

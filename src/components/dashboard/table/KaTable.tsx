@@ -24,6 +24,8 @@ interface KaTableProps<T> {
     rowKeyField: string;
     actions?: Array<(props: { row: T }) => React.ReactNode>;
     filters?: Filter[];
+    defaultPageSize?: number;
+    pageSizes?: number[];
     refreshIndex?: number;
 }
 
@@ -33,12 +35,14 @@ const KaTable = <T extends object>({
                                        rowKeyField = 'id',
                                        actions = [],
                                        filters = [], // Default è un array vuoto
+                                        defaultPageSize = 10, // Default a 10
+                                        pageSizes = [5, 10, 20], // Default page sizes
                                        refreshIndex = 0, // Default a 0
                                    }: KaTableProps<T>) => {
     const [data, setData] = useState<T[]>([]);
     const [loading, setLoading] = useState(true);
     const [pageIndex, setPageIndex] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(defaultPageSize);
     const [orderBy, setOrderBy] = useState('id');
     const [order, setOrder] = useState('desc');
     const [activeFilters, setActiveFilters] = useState<any>([]);
@@ -163,7 +167,7 @@ const KaTable = <T extends object>({
                         enabled: true,
                         pageIndex: pageIndex,
                         pageSize: pageSize,
-                        pageSizes: [5, 10, 20],
+                        pageSizes: pageSizes,
                         position: PagingPosition.Bottom,
                         pagesCount: pagesCount,
                     }}

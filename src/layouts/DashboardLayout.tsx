@@ -4,9 +4,16 @@ import Header from '@/components/dashboard/layout/Header';
 import Sidebar from '@/components/dashboard/layout/Sidebar';
 import Can from '@/components/dashboard/permission/Can';
 import {acl} from '@/acl';
+import {useServices} from '@/servicesContext';
+import Route from '@/types/Route';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faPlus, faMapMarkerAlt} from '@fortawesome/free-solid-svg-icons';
 
 const DashboardLayout: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
+    const [activeRoute, setActiveRoute] = useState<Route | null>(null);
+    const [routeLoading, setRouteLoading] = useState<boolean>(true);
+    const {routeService} = useServices();
 
     useEffect(() => {
         const handleResize = () => {
@@ -17,6 +24,22 @@ const DashboardLayout: React.FC = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    useEffect(() => {
+        const fetchActiveRoute = async () => {
+            try {
+                setRouteLoading(true);
+                const route = await routeService.getActiveRoute();
+                setActiveRoute(route);
+            } catch (err) {
+                console.error('Errore nel recupero della rotta attiva:', err);
+            } finally {
+                setRouteLoading(false);
+            }
+        };
+
+        fetchActiveRoute();
+    }, [routeService]);
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
@@ -50,13 +73,15 @@ const DashboardLayout: React.FC = () => {
                 {/* Pulsante di aggiunta in basso a destra */}
                 <Can permission={acl.ROUTE_CREATE}>
                     <Link 
-                        to="/dashboard/routes/new"
-                        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-primary text-white shadow-lg flex items-center justify-center text-3xl hover:bg-primary-700 cursor-pointer transition-colors z-10"
-                        aria-label="Aggiungi percorso"
+                        to={activeRoute ? "/dashboard/routes/current" : "/dashboard/routes/new"}
+                        className={`fixed bottom-6 right-6 w-16 h-16 rounded-full ${activeRoute ? 'bg-green-600 hover:bg-green-700' : 'bg-primary hover:bg-primary-700'} text-white shadow-lg flex items-center justify-center text-3xl cursor-pointer transition-colors z-10`}
+                        aria-label={activeRoute ? "Visualizza percorso attivo" : "Aggiungi percorso"}
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-8 h-8">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
+                        {routeLoading ? (
+                            <span className="animate-pulse">...</span>
+                        ) : (
+                            <FontAwesomeIcon icon={activeRoute ? faMapMarkerAlt : faPlus} className="w-7 h-7" />
+                        )}
                     </Link>
                 </Can>
             </div>

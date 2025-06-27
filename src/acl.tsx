@@ -46,6 +46,14 @@ export const getAllPermissions = () => {
     return Object.values(acl);
 }
 
+export const getAdministratorPermissions = () => {
+    let allPermissions = getAllPermissions();
+    return allPermissions.filter(permission =>
+        // remove ROUTE_CREATE
+        permission !== acl.ROUTE_CREATE
+    )
+}
+
 // Mappa ruoli-permessi
 export const rolePermissions: Record<string, string[]> = {
     'carrier': [
@@ -64,6 +72,6 @@ export const rolePermissions: Record<string, string[]> = {
         acl.MEDIA_LIST,
         acl.MEDIA_READ,
     ],
-    'administrator': getAllPermissions(),
+    'administrator': getAdministratorPermissions(),
     // Altri ruoli...
 };

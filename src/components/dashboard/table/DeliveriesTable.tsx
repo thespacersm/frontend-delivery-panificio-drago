@@ -76,6 +76,10 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
         navigate(`/dashboard/deliveries/${row.id}/edit`);
     };
 
+    const handleView = (row: any) => {
+        navigate(`/dashboard/deliveries/${row.id}/view`);
+    };
+
     const handleDelete = async (row: any) => {
         try {
             await deliveryService.deleteDelivery(row.id);
@@ -88,10 +92,12 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
     };
 
     const ViewAction = ({ row }: { row: any }) => (
-        <Link to={`/dashboard/deliveries/${row.id}/view`} className="text-blue-600 hover:text-blue-900 mr-2">
+        <button 
+            onClick={() => handleView(row)}
+            className="text-blue-600 hover:text-blue-900 mr-2"
+        >
             <FontAwesomeIcon icon={faEye} className="mr-1" />
-            Visualizza
-        </Link>
+        </button>
     );
 
     const columns = [

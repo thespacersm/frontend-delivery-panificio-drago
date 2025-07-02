@@ -163,10 +163,10 @@ const DeliveriesView: React.FC = () => {
             ) : error ? (
                 <PageError message={error} type="error" />
             ) : delivery ? (
-                <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <Card>
                         <h2 className="text-xl font-semibold mb-4">Informazioni Consegna</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
                             <div>
                                 <p className="mb-2"><span className="font-medium">Titolo:</span> {delivery.title.rendered}</p>
                                 <p className="mb-2"><span className="font-medium">Codice Cliente SEA:</span> {delivery.acf.sea_id || 'N/A'}</p>
@@ -242,22 +242,24 @@ const DeliveriesView: React.FC = () => {
                         </Card>
                     )}
 
-                    <Card>
-                        <h2 className="text-xl font-semibold mb-4">Media</h2>
-                        {updatingGallery ? (
-                            <div className="text-center py-4">
-                                <Loader message="Aggiornamento galleria..." />
-                            </div>
-                        ) : (
-                            <MediaGallery 
-                                media={media} 
-                                loading={loadingMedia} 
-                                error={mediaError}
-                                onUpload={handleMediaUpload}
-                                allowUpload={true}
-                            />
-                        )}
-                    </Card>
+                    <div className="lg:col-span-2">
+                        <Card>
+                            <h2 className="text-xl font-semibold mb-4">Media</h2>
+                            {updatingGallery ? (
+                                <div className="text-center py-4">
+                                    <Loader message="Aggiornamento galleria..." />
+                                </div>
+                            ) : (
+                                <MediaGallery 
+                                    media={media} 
+                                    loading={loadingMedia} 
+                                    error={mediaError}
+                                    onUpload={handleMediaUpload}
+                                    allowUpload={true}
+                                />
+                            )}
+                        </Card>
+                    </div>
                 </div>
             ) : (
                 <PageError message="Nessuna consegna trovata" type="info" />

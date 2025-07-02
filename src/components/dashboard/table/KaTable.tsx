@@ -99,6 +99,8 @@ const KaTable = <T extends object>({
                     setOrderBy(columnKey);
                     setOrder('asc');
                 }
+                // Resetta alla prima pagina quando cambia l'ordinamento
+                setPageIndex(0);
             }
         }
     });

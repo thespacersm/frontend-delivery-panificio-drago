@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 interface DateRangeFilterProps {
     filterKey: string;
     title: string;
-    value: { from?: string; to?: string };
+    value: string | { from?: string; to?: string };
     onChange: (filterKey: string, value: string) => void;
 }
 
@@ -13,16 +13,33 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
     value,
     onChange,
 }) => {
-    const [fromDate, setFromDate] = useState(value.from || '');
-    const [toDate, setToDate] = useState(value.to || '');
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
 
     useEffect(() => {
-        // Estrai solo la parte della data (YYYY-MM-DD) se presente
-        const fromDateOnly = value.from ? value.from.split(' ')[0] : '';
-        const toDateOnly = value.to ? value.to.split(' ')[0] : '';
-        console.log(value);
-        setFromDate(fromDateOnly);
-        setToDate(toDateOnly);
+        // Gestisce sia il caso in cui value sia una stringa che un oggetto
+        if (typeof value === 'string' && value) {
+            // Se value è una stringa, parsala per estrarre le date
+            const dates = value.split(',');
+            if (dates.length >= 1 && dates[0]) {
+                const fromDateTime = dates[0].trim();
+                setFromDate(fromDateTime.split(' ')[0] || '');
+            }
+            if (dates.length >= 2 && dates[1]) {
+                const toDateTime = dates[1].trim();
+                setToDate(toDateTime.split(' ')[0] || '');
+            }
+        } else if (typeof value === 'object' && value) {
+            // Se value è un oggetto, estrai le date direttamente
+            const fromDateOnly = value.from ? value.from.split(' ')[0] : '';
+            const toDateOnly = value.to ? value.to.split(' ')[0] : '';
+            setFromDate(fromDateOnly);
+            setToDate(toDateOnly);
+        } else {
+            // Se value è vuoto o null, resetta i campi
+            setFromDate('');
+            setToDate('');
+        }
     }, [value]);
 
     const handleFromDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,8 +57,8 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
         const newToDate = e.target.value;
         setToDate(newToDate);
 
-        const fromDateTime = fromDate ? `${fromDate} 00:00` : '';
-        const toDateTime = newToDate ? `${newToDate} 23:59` : '';
+        const fromDateTime = fromDate ? `${fromDate} 00:00:00` : '';
+        const toDateTime = newToDate ? `${newToDate} 23:59:59` : '';
         const dateRangeString = [fromDateTime, toDateTime].filter(Boolean).join(',');
 
         onChange(filterKey, dateRangeString);

@@ -160,7 +160,7 @@ const Filters: React.FC<FiltersProps> = ({
                                     key={filter.key}
                                     filterKey={filter.key}
                                     title={filter.title}
-                                    value={currentValue || ""}
+                                    value={currentValue}
                                     onChange={handleFilterUpdate}
                                 />
                             );

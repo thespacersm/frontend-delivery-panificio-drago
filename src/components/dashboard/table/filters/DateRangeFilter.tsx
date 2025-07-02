@@ -23,18 +23,22 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
             const dates = value.split(',');
             if (dates.length >= 1 && dates[0]) {
                 const fromDateTime = dates[0].trim();
-                setFromDate(fromDateTime.split(' ')[0] || '');
+                // Converte "YYYY-MM-DD HH:mm:ss" in "YYYY-MM-DDTHH:mm"
+                const formattedFrom = fromDateTime.replace(' ', 'T').slice(0, 16);
+                setFromDate(formattedFrom);
             }
             if (dates.length >= 2 && dates[1]) {
                 const toDateTime = dates[1].trim();
-                setToDate(toDateTime.split(' ')[0] || '');
+                // Converte "YYYY-MM-DD HH:mm:ss" in "YYYY-MM-DDTHH:mm"
+                const formattedTo = toDateTime.replace(' ', 'T').slice(0, 16);
+                setToDate(formattedTo);
             }
         } else if (typeof value === 'object' && value) {
             // Se value è un oggetto, estrai le date direttamente
-            const fromDateOnly = value.from ? value.from.split(' ')[0] : '';
-            const toDateOnly = value.to ? value.to.split(' ')[0] : '';
-            setFromDate(fromDateOnly);
-            setToDate(toDateOnly);
+            const fromFormatted = value.from ? value.from.replace(' ', 'T').slice(0, 16) : '';
+            const toFormatted = value.to ? value.to.replace(' ', 'T').slice(0, 16) : '';
+            setFromDate(fromFormatted);
+            setToDate(toFormatted);
         } else {
             // Se value è vuoto o null, resetta i campi
             setFromDate('');
@@ -46,8 +50,9 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
         const newFromDate = e.target.value;
         setFromDate(newFromDate);
 
-        const fromDateTime = newFromDate ? `${newFromDate} 00:00:00` : '';
-        const toDateTime = toDate ? `${toDate} 23:59:59` : '';
+        // Converte "YYYY-MM-DDTHH:mm" in "YYYY-MM-DD HH:mm:ss"
+        const fromDateTime = newFromDate ? `${newFromDate.replace('T', ' ')}:00` : '';
+        const toDateTime = toDate ? `${toDate.replace('T', ' ')}:59` : '';
         const dateRangeString = [fromDateTime, toDateTime].filter(Boolean).join(',');
 
         onChange(filterKey, dateRangeString);
@@ -57,8 +62,9 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
         const newToDate = e.target.value;
         setToDate(newToDate);
 
-        const fromDateTime = fromDate ? `${fromDate} 00:00:00` : '';
-        const toDateTime = newToDate ? `${newToDate} 23:59:59` : '';
+        // Converte "YYYY-MM-DDTHH:mm" in "YYYY-MM-DD HH:mm:ss"
+        const fromDateTime = fromDate ? `${fromDate.replace('T', ' ')}:00` : '';
+        const toDateTime = newToDate ? `${newToDate.replace('T', ' ')}:59` : '';
         const dateRangeString = [fromDateTime, toDateTime].filter(Boolean).join(',');
 
         onChange(filterKey, dateRangeString);
@@ -71,7 +77,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
                 <div className="flex flex-col w-1/2">
                     <label className="text-xs text-gray-500 mb-1">Da</label>
                     <input
-                        type="date"
+                        type="datetime-local"
                         className="border-gray-300 border rounded-md px-2 py-1 text-sm w-full"
                         value={fromDate}
                         onChange={handleFromDateChange}
@@ -80,7 +86,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
                 <div className="flex flex-col w-1/2">
                     <label className="text-xs text-gray-500 mb-1">A</label>
                     <input
-                        type="date"
+                        type="datetime-local"
                         className="border-gray-300 border rounded-md px-2 py-1 text-sm w-full"
                         value={toDate}
                         onChange={handleToDateChange}

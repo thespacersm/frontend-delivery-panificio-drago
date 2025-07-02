@@ -49,7 +49,7 @@ const CarrierRoute: React.FC = () => {
                     {activeRoute ? (
                         <div>
                             <p className="text-sm text-gray-600 mb-3">
-                                Percorso attivo: <span className="font-medium">{activeRoute.name}</span>
+                                Percorso attivo: <span className="font-medium">{activeRoute.title.rendered}</span>
                             </p>
                             <Link
                                 to="/dashboard/routes/current"

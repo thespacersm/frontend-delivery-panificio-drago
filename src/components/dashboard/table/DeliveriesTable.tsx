@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import KaTable from './KaTable';
 import EditAction from './actions/EditAction';
 import DeleteAction from './actions/DeleteAction';
@@ -96,7 +96,7 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
             onClick={() => handleView(row)}
             className="text-blue-600 hover:text-blue-900 mr-2"
         >
-            <FontAwesomeIcon icon={faEye} className="mr-1" />
+            <FontAwesomeIcon icon={faEye} className="mr-1" size="1x"/>
         </button>
     );
 
@@ -130,7 +130,13 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
             key: 'is_prepared_date', title: 'Data Preparazione', width: 150, render: (value: string) => (
                 value ? (
                     <div className="text-sm">
-                        {new Date(value).toLocaleDateString('it-IT')}
+                        {new Date(value).toLocaleString('it-IT', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
                     </div>
                 ) : (
                     <span className="text-gray-400">-</span>
@@ -149,7 +155,13 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
             key: 'is_loaded_date', title: 'Data Caricamento', width: 150, render: (value: string) => (
                 value ? (
                     <div className="text-sm">
-                        {new Date(value).toLocaleDateString('it-IT')}
+                        {new Date(value).toLocaleString('it-IT', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
                     </div>
                 ) : (
                     <span className="text-gray-400">-</span>
@@ -168,7 +180,13 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
             key: 'is_delivered_date', title: 'Data Consegna', width: 150, render: (value: string) => (
                 value ? (
                     <div className="text-sm">
-                        {new Date(value).toLocaleDateString('it-IT')}
+                        {new Date(value).toLocaleString('it-IT', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
                     </div>
                 ) : (
                     <span className="text-gray-400">-</span>

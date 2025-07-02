@@ -36,12 +36,12 @@ const NumberFilter: React.FC<NumberFilterProps> = ({
     };
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
             <label className="text-sm font-medium text-gray-700 mb-1">{title}</label>
             <div className="flex">
                 <input
                     type="number"
-                    className="border-primary bg-white border rounded-md px-2 py-1"
+                    className="w-full border-primary bg-white border rounded-md px-2 py-1"
                     value={inputValue}
                     onChange={handleInputChange}
                     onBlur={handleApplyFilter}

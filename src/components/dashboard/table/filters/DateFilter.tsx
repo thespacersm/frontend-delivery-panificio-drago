@@ -28,7 +28,7 @@ const DateFilter: React.FC<DateFilterProps> = ({
     };
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
             <label className="text-sm font-medium text-gray-700 mb-1">{title}</label>
             <div className="flex">
                 <input

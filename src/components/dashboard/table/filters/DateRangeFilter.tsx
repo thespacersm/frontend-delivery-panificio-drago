@@ -48,23 +48,23 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
     };
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
             <label className="text-sm font-medium text-gray-700 mb-1">{title}</label>
-            <div className="flex gap-2">
-                <div className="flex flex-col">
+            <div className="flex flex-row gap-1 sm:gap-2">
+                <div className="flex flex-col w-1/2">
                     <label className="text-xs text-gray-500 mb-1">Da</label>
                     <input
                         type="date"
-                        className="border-gray-300 border rounded-md px-2 py-1 text-sm"
+                        className="border-gray-300 border rounded-md px-2 py-1 text-sm w-full"
                         value={fromDate}
                         onChange={handleFromDateChange}
                     />
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col w-1/2">
                     <label className="text-xs text-gray-500 mb-1">A</label>
                     <input
                         type="date"
-                        className="border-gray-300 border rounded-md px-2 py-1 text-sm"
+                        className="border-gray-300 border rounded-md px-2 py-1 text-sm w-full"
                         value={toDate}
                         onChange={handleToDateChange}
                     />

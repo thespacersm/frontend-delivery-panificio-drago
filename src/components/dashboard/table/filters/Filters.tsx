@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
 import NumberFilter from './NumberFilter';
 import TextFilter from './TextFilter';
 import SelectFilter from './SelectFilter';
@@ -24,11 +26,13 @@ interface FiltersProps {
 
 const Filters: React.FC<FiltersProps> = ({
     filters,
-                                             activeFilters,
-                                             onFilterChange
-                                         }) => {
+    activeFilters,
+    onFilterChange
+}) => {
     // Stato locale per tenere traccia dei filtri modificati ma non ancora applicati
     const [pendingFilters, setPendingFilters] = useState<any[]>([]);
+    // Stato per la visibilità dei filtri su mobile
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
 
     // Inizializza i filtri pendenti con i filtri attivi quando cambiano
     useEffect(() => {
@@ -95,7 +99,16 @@ const Filters: React.FC<FiltersProps> = ({
 
     return (
         <div className="mb-2 flex flex-col">
-            <div className="flex flex-wrap gap-4 items-end">
+            {/* Toggle button per mobile */}
+            <button
+                onClick={() => setShowMobileFilters(!showMobileFilters)}
+                className="lg:hidden flex items-center gap-2 px-3 py-2 mb-3 bg-gray-200 text-gray-600 text-sm rounded-full hover:bg-gray-300 transition-colors w-fit shadow-sm border border-gray-300"
+            >
+                <FontAwesomeIcon icon={faBars} className="text-xs" />
+                <span className="font-medium">Filtri</span>
+            </button>
+
+            <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 items-end ${showMobileFilters ? 'block' : 'hidden lg:grid'}`}>
                 {filters.map((filter) => {
                     const currentValue = pendingFilters.find(f => f.key === filter.key)?.value || '';
 
@@ -158,7 +171,7 @@ const Filters: React.FC<FiltersProps> = ({
 
                 <button
                     onClick={applyFilters}
-                    className="px-4 py-2 bg-black text-white text-xs rounded-md hover:bg-primary-700 cursor-pointer transition-colors"
+                    className="px-4 py-2 bg-black text-white text-xs rounded-md hover:bg-primary-700 cursor-pointer transition-colors w-full sm:w-auto"
                 >
                     Filtra
                 </button>

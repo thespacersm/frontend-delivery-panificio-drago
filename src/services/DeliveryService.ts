@@ -3,6 +3,7 @@ import Delivery from '@/types/Delivery';
 import DeliveryPdfResponse from '@/types/DeliveryPdfResponse';
 import he from 'he';
 import RestFilter from '@/types/RestFilter';
+import { parseUtils } from '@/utils/parseUtils';
 
 class DeliveryService {
     private deliveryClient: DeliveryClient;
@@ -38,6 +39,7 @@ class DeliveryService {
         try {
             let response = await this.deliveryClient.getDelivery(id);
             response.title.rendered = he.decode(response.title.rendered);
+            response.content.rendered = parseUtils.stripHtmlTags(he.decode(response.content.rendered));
             return response;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : `Errore durante il recupero della consegna con ID ${id}`;

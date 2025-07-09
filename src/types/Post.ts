@@ -19,6 +19,10 @@ interface Post {
         rendered: string;
         raw: string;
     };
+    content: {
+        rendered: string;
+        raw: string;
+    };
     template: string;
     acf: {
         [key: string]: any; // Per consentire campi ACF dinamici

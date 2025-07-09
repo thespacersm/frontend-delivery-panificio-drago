@@ -21,6 +21,9 @@ const RoutesForm: React.FC<RoutesFormProps> = ({route, onSubmit, isSubmitting, v
     const [formData, setFormData] = useState<Route>({
         ...route || {},
         status: 'publish',
+        title: {
+            raw: route?.title?.raw || '',
+        },
         acf: {
             ...route?.acf || {},
             date: new Date().toISOString(),
@@ -72,14 +75,6 @@ const RoutesForm: React.FC<RoutesFormProps> = ({route, onSubmit, isSubmitting, v
         // Utilizza la utility aggiornata con il parametro type
         let newFormData = updateFormData(formData, name, value, type, checked);
 
-        newFormData = {
-            ...newFormData,
-            title: {
-                ...newFormData.title,
-                raw: generateTitle(newFormData)
-            }
-        }
-
         if (newFormData.acf?.internal_vehicle) {
             // Se il veicolo è interno e è stato selezionato un veicolo
             if (newFormData.acf?.vehicle_id) {
@@ -105,6 +100,14 @@ const RoutesForm: React.FC<RoutesFormProps> = ({route, onSubmit, isSubmitting, v
                     plate: ''
                 }
             };
+        }
+
+        newFormData = {
+            ...newFormData,
+            title: {
+                ...newFormData.title,
+                raw: generateTitle(newFormData)
+            }
         }
 
         setFormData(newFormData);

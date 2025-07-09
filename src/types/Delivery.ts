@@ -7,6 +7,9 @@ interface Delivery extends Post {
         zone_sea_id: string;
         zone_id: string;
         date: string;
+        zone_name: string;
+        carrier_name: string;
+        vehicle_name: string;
         sea_customer_code: string;
         customer_id: string;
         document: string;

@@ -57,7 +57,10 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                     is_delivered: delivery.acf.is_delivered,
                     is_prepared_date: delivery.acf.is_prepared_date,
                     is_loaded_date: delivery.acf.is_loaded_date,
-                    is_delivered_date: delivery.acf.is_delivered_date
+                    is_delivered_date: delivery.acf.is_delivered_date,
+                    zone_name: delivery.acf.zone_name,
+                    carrier_name: delivery.acf.carrier_name,
+                    vehicle_name: delivery.acf.vehicle_name
                 }
             });
 
@@ -118,6 +121,9 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                 )
             }
         },
+        { key: 'zone_name', title: 'Zona', dataType: DataType.String },
+        { key: 'carrier_name', title: 'Trasportatore', dataType: DataType.String },
+        { key: 'vehicle_name', title: 'Veicolo', dataType: DataType.String },
         {
             key: 'is_prepared', title: 'Preparata', width: 120, dataType: DataType.Boolean, render: (value: boolean) => (
                 <FontAwesomeIcon
@@ -204,6 +210,21 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
         {
             key: 'title',
             title: 'Cliente',
+            type: 'text' as const
+        },
+        {
+            key: 'zone_name',
+            title: 'Zona',
+            type: 'text' as const
+        },
+        {
+            key: 'carrier_name',
+            title: 'Trasportatore',
+            type: 'text' as const
+        },
+        {
+            key: 'vehicle_name',
+            title: 'Veicolo',
             type: 'text' as const
         },
         {

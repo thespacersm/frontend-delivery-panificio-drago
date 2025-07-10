@@ -8,6 +8,8 @@ import StatusToggle from '@/components/dashboard/deliveries/StatusToggle';
 import { useServices } from '@/servicesContext';
 import MediaGallery from '@/components/dashboard/media/MediaGallery';
 import Media from '@/types/Media';
+import Can from '@/components/dashboard/permission/Can';
+import { acl } from '@/acl';
 
 const DeliveriesView: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -21,6 +23,8 @@ const DeliveriesView: React.FC = () => {
     const [loadingMedia, setLoadingMedia] = useState<boolean>(false);
     const [mediaError, setMediaError] = useState<string | null>(null);
     const [updatingGallery, setUpdatingGallery] = useState<boolean>(false);
+    const [note, setNote] = useState<string>('');
+    const [addingNote, setAddingNote] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -144,6 +148,22 @@ const DeliveriesView: React.FC = () => {
         }
     };
 
+    const handleAddNote = async () => {
+        if (!id || !note.trim()) return;
+        
+        try {
+            setAddingNote(true);
+            await deliveryService.addNote(parseInt(id), note.trim());
+            setNote('');
+            // Potresti voler ricaricare i dati della consegna qui se le note sono incluse nella risposta
+        } catch (err) {
+            setError(`Errore nell'aggiunta della nota: ${err instanceof Error ? err.message : 'Errore sconosciuto'}`);
+            console.error(err);
+        } finally {
+            setAddingNote(false);
+        }
+    };
+
     return (
         <div>
             <PageHeader 
@@ -169,7 +189,9 @@ const DeliveriesView: React.FC = () => {
                         <div className="space-y-4">
                             <div>
                                 <p className="mb-2"><span className="font-medium">Titolo:</span> {delivery.title.rendered}</p>
-                                <p className="mb-2"><span className="font-medium">Codice Cliente SEA:</span> {delivery.acf.sea_id || 'N/A'}</p>
+                                <Can permission={acl.DELIVERY_ADVANCED_VIEW}>
+                                    <p className="mb-2"><span className="font-medium">Codice Cliente SEA:</span> {delivery.acf.sea_id || 'N/A'}</p>
+                                </Can>
                                 <p className="mb-2">
                                     <span className="font-medium">Data:</span> {
                                         delivery.acf.date ? new Date(delivery.acf.date).toLocaleDateString('it-IT') : 'N/A'
@@ -228,19 +250,21 @@ const DeliveriesView: React.FC = () => {
                         </div>
                     </Card>
 
-                    {customer && (
-                        <Card>
-                            <h2 className="text-xl font-semibold mb-4">Informazioni Cliente</h2>
-                            <p className="mb-2"><span className="font-medium">Nome:</span> {customer.title.rendered}</p>
-                            <p className="mb-2"><span className="font-medium">Codice Cliente SEA:</span> {customer.acf.sea_code || 'N/A'}</p>
-                            <p className="mb-2">
-                                <span className="font-medium">Indirizzo:</span> {customer.acf.address_street}, {customer.acf.address_location}
-                            </p>
-                            {customer.acf.telephone && (
-                                <p className="mb-2"><span className="font-medium">Telefono:</span> {customer.acf.telephone}</p>
-                            )}
-                        </Card>
-                    )}
+                    <Can permission={acl.DELIVERY_ADVANCED_VIEW}>
+                        {customer && (
+                            <Card>
+                                <h2 className="text-xl font-semibold mb-4">Informazioni Cliente</h2>
+                                <p className="mb-2"><span className="font-medium">Nome:</span> {customer.title.rendered}</p>
+                                <p className="mb-2"><span className="font-medium">Codice Cliente SEA:</span> {customer.acf.sea_code || 'N/A'}</p>
+                                <p className="mb-2">
+                                    <span className="font-medium">Indirizzo:</span> {customer.acf.address_street}, {customer.acf.address_location}
+                                </p>
+                                {customer.acf.telephone && (
+                                    <p className="mb-2"><span className="font-medium">Telefono:</span> {customer.acf.telephone}</p>
+                                )}
+                            </Card>
+                        )}
+                    </Can>
 
                     <div className="lg:col-span-2">
                         <Card>
@@ -258,6 +282,33 @@ const DeliveriesView: React.FC = () => {
                                     allowUpload={true}
                                 />
                             )}
+                        </Card>
+                    </div>
+
+                    <div className="lg:col-span-2">
+                        <Card>
+                            <h2 className="text-xl font-semibold mb-4">Note</h2>
+                            <div className="space-y-4">
+                                <div>
+                                    <textarea
+                                        value={note}
+                                        onChange={(e) => setNote(e.target.value)}
+                                        placeholder="Inserisci una nota per questa consegna..."
+                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                        rows={4}
+                                        disabled={addingNote}
+                                    />
+                                </div>
+                                <div className="flex justify-end">
+                                    <button
+                                        onClick={handleAddNote}
+                                        disabled={addingNote || !note.trim()}
+                                        className="bg-primary hover:bg-primary-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {addingNote ? 'Aggiungendo...' : 'Aggiungi nota'}
+                                    </button>
+                                </div>
+                            </div>
                         </Card>
                     </div>
                 </div>

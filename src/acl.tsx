@@ -30,6 +30,7 @@ export const acl = {
     DELIVERY_PREPARE: "delivery:prepare",
     DELIVERY_LOAD: "delivery:load",
     DELIVERY_DELIVER: "delivery:deliver",
+    DELIVERY_ADVANCED_VIEW: "delivery:advanced_view",
     
     // Permessi percorsi
     ROUTE_CREATE: "route:create",

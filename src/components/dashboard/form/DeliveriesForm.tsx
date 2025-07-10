@@ -113,45 +113,6 @@ const DeliveriesForm: React.FC<DeliveriesFormProps> = ({delivery, onSubmit, isSu
                 />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="flex items-center">
-                        <input
-                            type="checkbox"
-                            name="acf.is_prepared"
-                            checked={formData.acf.is_prepared}
-                            onChange={handleInputChange}
-                            className="mr-2"
-                        />
-                        Preparata
-                    </label>
-                </div>
-                <div>
-                    <label className="flex items-center">
-                        <input
-                            type="checkbox"
-                            name="acf.is_loaded"
-                            checked={formData.acf.is_loaded}
-                            onChange={handleInputChange}
-                            className="mr-2"
-                        />
-                        Caricata
-                    </label>
-                </div>
-                <div>
-                    <label className="flex items-center">
-                        <input
-                            type="checkbox"
-                            name="acf.is_delivered"
-                            checked={formData.acf.is_delivered}
-                            onChange={handleInputChange}
-                            className="mr-2"
-                        />
-                        Consegnata
-                    </label>
-                </div>
-            </div>
-
             <div className="flex justify-end">
                 <button
                     type="submit"

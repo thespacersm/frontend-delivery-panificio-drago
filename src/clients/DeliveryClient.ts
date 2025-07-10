@@ -205,6 +205,22 @@ class DeliveryClient {
             combinedFilters
         );
     }
+
+    /**
+     * @async
+     * @function addNote
+     * Aggiunge una nota a una consegna specifica.
+     * @param {number} deliveryId - L'ID della consegna.
+     * @param {string} note - La nota da aggiungere.
+     * @returns {Promise<any>} - Una promise che risolve con la risposta dell'aggiunta della nota.
+     */
+    async addNote(deliveryId: number, note: string): Promise<any> {
+        const response = await this.wpClient.post<any>('/wp-json/ts-delivery/v1/add-note', {
+            delivery_id: deliveryId,
+            note: note
+        });
+        return response.data;
+    }
 }
 
 export default DeliveryClient;

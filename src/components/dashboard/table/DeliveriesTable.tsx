@@ -97,9 +97,10 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
     const ViewAction = ({ row }: { row: any }) => (
         <button 
             onClick={() => handleView(row)}
-            className="text-blue-600 hover:text-blue-900 mr-2"
+            className="text-blue-600 hover:text-blue-900 mr-2 flex items-center md:inline-flex md:bg-transparent md:border-0 md:p-0 bg-blue-500 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors"
         >
-            <FontAwesomeIcon icon={faEye} className="mr-1" size="1x"/>
+            <FontAwesomeIcon icon={faEye} className="mr-1 md:text-blue-600" size="1x"/>
+            <span className="md:hidden">Apri</span>
         </button>
     );
 

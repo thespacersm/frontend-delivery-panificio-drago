@@ -149,6 +149,16 @@ class DeliveryService {
             throw error;
         }
     }
+
+    async addNote(deliveryId: number, note: string): Promise<any> {
+        try {
+            return await this.deliveryClient.addNote(deliveryId, note);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : `Errore durante l'aggiunta della nota per la consegna con ID ${deliveryId}`;
+            console.error(errorMessage);
+            throw error;
+        }
+    }
 }
 
 export default DeliveryService;

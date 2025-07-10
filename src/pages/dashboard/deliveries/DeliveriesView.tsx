@@ -89,19 +89,36 @@ const DeliveriesView: React.FC = () => {
         try {
             setUpdatingField(field);
             
-            // Crea una copia del delivery con il campo aggiornato
+            let response;
+            
+            // Usa il metodo specifico per ogni flag
+            switch (field) {
+                case 'is_prepared':
+                    response = await deliveryService.togglePrepared(parseInt(id), value);
+                    break;
+                case 'is_loaded':
+                    response = await deliveryService.toggleLoaded(parseInt(id), value);
+                    break;
+                case 'is_delivered':
+                    response = await deliveryService.toggleDelivered(parseInt(id), value);
+                    break;
+                default:
+                    throw new Error(`Campo non supportato: ${field}`);
+            }
+            
+            // Aggiorna lo stato locale con i dati dalla risposta
             const updatedDelivery = {
                 ...delivery,
                 acf: {
                     ...delivery.acf,
-                    [field]: value
+                    [field]: value,
+                    // Aggiorna anche le date se presenti nella risposta
+                    ...(response.is_prepared_date && { is_prepared_date: response.is_prepared_date }),
+                    ...(response.is_loaded_date && { is_loaded_date: response.is_loaded_date }),
+                    ...(response.is_delivered_date && { is_delivered_date: response.is_delivered_date })
                 }
             };
             
-            // Invia l'aggiornamento al server
-            await deliveryService.updateDelivery(parseInt(id), updatedDelivery);
-            
-            // Aggiorna lo stato locale
             setDelivery(updatedDelivery);
         } catch (err) {
             setError(`Errore nell'aggiornamento dello stato: ${err instanceof Error ? err.message : 'Errore sconosciuto'}`);

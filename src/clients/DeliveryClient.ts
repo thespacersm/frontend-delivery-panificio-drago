@@ -221,6 +221,54 @@ class DeliveryClient {
         });
         return response.data;
     }
+
+    /**
+     * @async
+     * @function togglePrepared
+     * Attiva/disattiva lo stato di preparazione di una delivery.
+     * @param {number} deliveryId - L'ID della consegna.
+     * @param {boolean} isPrepared - Stato di preparazione.
+     * @returns {Promise<any>} - Una promise che risolve con la risposta del toggle.
+     */
+    async togglePrepared(deliveryId: number, isPrepared: boolean): Promise<any> {
+        const response = await this.wpClient.post<any>('/wp-json/ts-delivery/v1/toggle-check', {
+            delivery_id: deliveryId,
+            is_prepared: isPrepared
+        });
+        return response.data;
+    }
+
+    /**
+     * @async
+     * @function toggleLoaded
+     * Attiva/disattiva lo stato di caricamento di una delivery.
+     * @param {number} deliveryId - L'ID della consegna.
+     * @param {boolean} isLoaded - Stato di caricamento.
+     * @returns {Promise<any>} - Una promise che risolve con la risposta del toggle.
+     */
+    async toggleLoaded(deliveryId: number, isLoaded: boolean): Promise<any> {
+        const response = await this.wpClient.post<any>('/wp-json/ts-delivery/v1/toggle-check', {
+            delivery_id: deliveryId,
+            is_loaded: isLoaded
+        });
+        return response.data;
+    }
+
+    /**
+     * @async
+     * @function toggleDelivered
+     * Attiva/disattiva lo stato di consegna di una delivery.
+     * @param {number} deliveryId - L'ID della consegna.
+     * @param {boolean} isDelivered - Stato di consegna.
+     * @returns {Promise<any>} - Una promise che risolve con la risposta del toggle.
+     */
+    async toggleDelivered(deliveryId: number, isDelivered: boolean): Promise<any> {
+        const response = await this.wpClient.post<any>('/wp-json/ts-delivery/v1/toggle-check', {
+            delivery_id: deliveryId,
+            is_delivered: isDelivered
+        });
+        return response.data;
+    }
 }
 
 export default DeliveryClient;

@@ -159,6 +159,36 @@ class DeliveryService {
             throw error;
         }
     }
+
+    async togglePrepared(deliveryId: number, isPrepared: boolean): Promise<any> {
+        try {
+            return await this.deliveryClient.togglePrepared(deliveryId, isPrepared);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : `Errore durante il toggle dello stato di preparazione per la consegna con ID ${deliveryId}`;
+            console.error(errorMessage);
+            throw error;
+        }
+    }
+
+    async toggleLoaded(deliveryId: number, isLoaded: boolean): Promise<any> {
+        try {
+            return await this.deliveryClient.toggleLoaded(deliveryId, isLoaded);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : `Errore durante il toggle dello stato di caricamento per la consegna con ID ${deliveryId}`;
+            console.error(errorMessage);
+            throw error;
+        }
+    }
+
+    async toggleDelivered(deliveryId: number, isDelivered: boolean): Promise<any> {
+        try {
+            return await this.deliveryClient.toggleDelivered(deliveryId, isDelivered);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : `Errore durante il toggle dello stato di consegna per la consegna con ID ${deliveryId}`;
+            console.error(errorMessage);
+            throw error;
+        }
+    }
 }
 
 export default DeliveryService;

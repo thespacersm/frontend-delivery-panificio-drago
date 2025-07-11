@@ -204,54 +204,56 @@ const DeliveriesView: React.FC = () => {
                                 </p>
                             </div>
                             
-                            <div>
-                                <h3 className="font-medium mb-3">Stato della consegna:</h3>
-                                <div className="bg-gray-50 p-3 rounded-lg shadow-sm space-y-3">
-                                    <div>
-                                        <StatusToggle 
-                                            field="is_prepared" 
-                                            isActive={delivery.acf.is_prepared} 
-                                            label="Preparata" 
-                                            updatingField={updatingField}
-                                            onUpdate={updateDeliveryStatus}
-                                            readOnly={true}
-                                        />
-                                        {delivery.acf.is_prepared_date && (
-                                            <p className="text-xs text-gray-500 mt-1 ml-6">
-                                                Data: {new Date(delivery.acf.is_prepared_date).toLocaleString('it-IT')}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <StatusToggle 
-                                            field="is_loaded" 
-                                            isActive={delivery.acf.is_loaded} 
-                                            label="Caricata" 
-                                            updatingField={updatingField}
-                                            onUpdate={updateDeliveryStatus}
-                                        />
-                                        {delivery.acf.is_loaded_date && (
-                                            <p className="text-xs text-gray-500 mt-1 ml-6">
-                                                Data: {new Date(delivery.acf.is_loaded_date).toLocaleString('it-IT')}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <StatusToggle 
-                                            field="is_delivered" 
-                                            isActive={delivery.acf.is_delivered} 
-                                            label="Consegnata" 
-                                            updatingField={updatingField}
-                                            onUpdate={updateDeliveryStatus}
-                                        />
-                                        {delivery.acf.is_delivered_date && (
-                                            <p className="text-xs text-gray-500 mt-1 ml-6">
-                                                Data: {new Date(delivery.acf.is_delivered_date).toLocaleString('it-IT')}
-                                            </p>
-                                        )}
+                            <Can permission={acl.DELIVERY_ADVANCED_VIEW}>
+                                <div>
+                                    <h3 className="font-medium mb-3">Stato della consegna:</h3>
+                                    <div className="bg-gray-50 p-3 rounded-lg shadow-sm space-y-3">
+                                        <div>
+                                            <StatusToggle 
+                                                field="is_prepared" 
+                                                isActive={delivery.acf.is_prepared} 
+                                                label="Preparata" 
+                                                updatingField={updatingField}
+                                                onUpdate={updateDeliveryStatus}
+                                                readOnly={true}
+                                            />
+                                            {delivery.acf.is_prepared_date && (
+                                                <p className="text-xs text-gray-500 mt-1 ml-6">
+                                                    Data: {new Date(delivery.acf.is_prepared_date).toLocaleString('it-IT')}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <StatusToggle 
+                                                field="is_loaded" 
+                                                isActive={delivery.acf.is_loaded} 
+                                                label="Caricata" 
+                                                updatingField={updatingField}
+                                                onUpdate={updateDeliveryStatus}
+                                            />
+                                            {delivery.acf.is_loaded_date && (
+                                                <p className="text-xs text-gray-500 mt-1 ml-6">
+                                                    Data: {new Date(delivery.acf.is_loaded_date).toLocaleString('it-IT')}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <StatusToggle 
+                                                field="is_delivered" 
+                                                isActive={delivery.acf.is_delivered} 
+                                                label="Consegnata" 
+                                                updatingField={updatingField}
+                                                onUpdate={updateDeliveryStatus}
+                                            />
+                                            {delivery.acf.is_delivered_date && (
+                                                <p className="text-xs text-gray-500 mt-1 ml-6">
+                                                    Data: {new Date(delivery.acf.is_delivered_date).toLocaleString('it-IT')}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </Can>
                         </div>
                     </Card>
 

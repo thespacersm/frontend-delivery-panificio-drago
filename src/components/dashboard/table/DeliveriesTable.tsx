@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import KaTable from './KaTable';
 import EditAction from './actions/EditAction';
 import DeleteAction from './actions/DeleteAction';
+import ViewAction from './actions/ViewAction';
 import { useServices } from '@/servicesContext';
 import { DataType } from 'ka-table/enums';
 import Can from '@/components/dashboard/permission/Can';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import Customer from '@/types/Customer';
+import { acl } from '@/acl';
 
 interface DeliveriesTableProps {
     routeId?: string | null;
@@ -29,9 +31,24 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
     defaultPageSize = 20,
     pageSizes = [5, 10, 20, 50, 100]
 }) => {
-    const { deliveryService, customerService } = useServices();
+    const { deliveryService, customerService, userService } = useServices();
     const navigate = useNavigate();
     const [internalRefreshIndex, setInternalRefreshIndex] = useState(0);
+    const [hasAdvancedView, setHasAdvancedView] = useState(false);
+
+    useEffect(() => {
+        const checkPermission = async () => {
+            try {
+                const hasPermission = await userService.hasPermission(acl.DELIVERY_ADVANCED_VIEW);
+                setHasAdvancedView(hasPermission);
+            } catch (error) {
+                console.error('Errore durante la verifica del permesso:', error);
+                setHasAdvancedView(false);
+            }
+        };
+
+        checkPermission();
+    }, [userService]);
 
     const fetchData = async (pageIndex: number, pageSize: number, orderBy: string, order: string, filters: any) => {
         try {
@@ -94,13 +111,70 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
         }
     };
 
-    const ViewAction = ({ row }: { row: any }) => (
-        <button 
-            onClick={() => handleView(row)}
-            className="text-blue-600 hover:text-blue-900 mr-2 flex items-center md:inline-flex md:bg-transparent md:border-0 md:p-0 bg-blue-500 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors"
+    const handleTogglePrepared = async (row: any) => {
+        const newState = !row.is_prepared;
+        const message = newState 
+            ? 'Sei sicuro di voler segnare questa consegna come preparata?'
+            : 'Sei sicuro di voler segnare questa consegna come non preparata?';
+        
+        if (window.confirm(message)) {
+            try {
+                await deliveryService.togglePrepared(row.id, newState);
+                setInternalRefreshIndex(prev => prev + 1);
+                onRefresh && onRefresh();
+            } catch (error) {
+                console.error('Errore durante l\'aggiornamento dello stato di preparazione:', error);
+                alert('Si è verificato un errore durante l\'aggiornamento');
+            }
+        }
+    };
+
+    const handleToggleLoaded = async (row: any) => {
+        const newState = !row.is_loaded;
+        const message = newState 
+            ? 'Sei sicuro di voler segnare questa consegna come caricata?'
+            : 'Sei sicuro di voler segnare questa consegna come non caricata?';
+        
+        if (window.confirm(message)) {
+            try {
+                await deliveryService.toggleLoaded(row.id, newState);
+                setInternalRefreshIndex(prev => prev + 1);
+                onRefresh && onRefresh();
+            } catch (error) {
+                console.error('Errore durante l\'aggiornamento dello stato di caricamento:', error);
+                alert('Si è verificato un errore durante l\'aggiornamento');
+            }
+        }
+    };
+
+    const handleToggleDelivered = async (row: any) => {
+        const newState = !row.is_delivered;
+        const message = newState 
+            ? 'Sei sicuro di voler segnare questa consegna come consegnata?'
+            : 'Sei sicuro di voler segnare questa consegna come non consegnata?';
+        
+        if (window.confirm(message)) {
+            try {
+                await deliveryService.toggleDelivered(row.id, newState);
+                setInternalRefreshIndex(prev => prev + 1);
+                onRefresh && onRefresh();
+            } catch (error) {
+                console.error('Errore durante l\'aggiornamento dello stato di consegna:', error);
+                alert('Si è verificato un errore durante l\'aggiornamento');
+            }
+        }
+    };
+
+    const ToggleButton = ({ value, onClick, title }: { value: boolean; onClick: () => void; title: string }) => (
+        <button
+            onClick={onClick}
+            className="cursor-pointer hover:scale-110 transition-transform"
+            title={title}
         >
-            <FontAwesomeIcon icon={faEye} className="mr-1 md:text-blue-600" size="1x"/>
-            <span className="md:hidden">Apri</span>
+            <FontAwesomeIcon
+                icon={value ? faCheckCircle : faTimesCircle}
+                className={value ? 'text-green-500 hover:text-green-600' : 'text-gray-400 hover:text-gray-500'}
+            />
         </button>
     );
 
@@ -123,17 +197,20 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
             }
         },
         { key: 'zone_name', title: 'Zona', dataType: DataType.String },
-        { key: 'carrier_name', title: 'Trasportatore', dataType: DataType.String },
-        { key: 'vehicle_name', title: 'Veicolo', dataType: DataType.String },
+        ...(hasAdvancedView ? [
+            { key: 'carrier_name', title: 'Trasportatore', dataType: DataType.String },
+            { key: 'vehicle_name', title: 'Veicolo', dataType: DataType.String },
+        ] : []),
         {
-            key: 'is_prepared', title: 'Preparata', width: 120, dataType: DataType.Boolean, render: (value: boolean) => (
-                <FontAwesomeIcon
-                    icon={value ? faCheckCircle : faTimesCircle}
-                    className={value ? 'text-green-500' : 'text-gray-400'}
+            key: 'is_prepared', title: 'Preparata', width: 120, dataType: DataType.Boolean, render: (value: boolean, row: any) => (
+                <ToggleButton 
+                    value={value} 
+                    onClick={() => handleTogglePrepared(row)}
+                    title={value ? 'Clicca per segnare come non preparata' : 'Clicca per segnare come preparata'}
                 />
             )
         },
-        {
+        ...(hasAdvancedView ? [{
             key: 'is_prepared_date', title: 'Data Preparazione', width: 150, render: (value: string) => (
                 value ? (
                     <div className="text-sm">
@@ -149,16 +226,17 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                     <span className="text-gray-400">-</span>
                 )
             )
-        },
+        }] : []),
         {
-            key: 'is_loaded', title: 'Caricata', width: 120, dataType: DataType.Boolean, render: (value: boolean) => (
-                <FontAwesomeIcon
-                    icon={value ? faCheckCircle : faTimesCircle}
-                    className={value ? 'text-green-500' : 'text-gray-400'}
+            key: 'is_loaded', title: 'Caricata', width: 120, dataType: DataType.Boolean, render: (value: boolean, row: any) => (
+                <ToggleButton 
+                    value={value} 
+                    onClick={() => handleToggleLoaded(row)}
+                    title={value ? 'Clicca per segnare come non caricata' : 'Clicca per segnare come caricata'}
                 />
             )
         },
-        {
+        ...(hasAdvancedView ? [{
             key: 'is_loaded_date', title: 'Data Caricamento', width: 150, render: (value: string) => (
                 value ? (
                     <div className="text-sm">
@@ -174,16 +252,17 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                     <span className="text-gray-400">-</span>
                 )
             )
-        },
+        }] : []),
         {
-            key: 'is_delivered', title: 'Consegnata', width: 120, dataType: DataType.Boolean, render: (value: boolean) => (
-                <FontAwesomeIcon
-                    icon={value ? faCheckCircle : faTimesCircle}
-                    className={value ? 'text-green-500' : 'text-gray-400'}
+            key: 'is_delivered', title: 'Consegnata', width: 120, dataType: DataType.Boolean, render: (value: boolean, row: any) => (
+                <ToggleButton 
+                    value={value} 
+                    onClick={() => handleToggleDelivered(row)}
+                    title={value ? 'Clicca per segnare come non consegnata' : 'Clicca per segnare come consegnata'}
                 />
             )
         },
-        {
+        ...(hasAdvancedView ? [{
             key: 'is_delivered_date', title: 'Data Consegna', width: 150, render: (value: string) => (
                 value ? (
                     <div className="text-sm">
@@ -199,7 +278,7 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                     <span className="text-gray-400">-</span>
                 )
             )
-        },
+        }] : []),
     ];
 
     const filterOptions = [
@@ -218,16 +297,18 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
             title: 'Zona',
             type: 'text' as const
         },
-        {
-            key: 'carrier_name',
-            title: 'Trasportatore',
-            type: 'text' as const
-        },
-        {
-            key: 'vehicle_name',
-            title: 'Veicolo',
-            type: 'text' as const
-        },
+        ...(hasAdvancedView ? [
+            {
+                key: 'carrier_name',
+                title: 'Trasportatore',
+                type: 'text' as const
+            },
+            {
+                key: 'vehicle_name',
+                title: 'Veicolo',
+                type: 'text' as const
+            },
+        ] : []),
         {
             key: 'is_prepared',
             title: 'Preparata',
@@ -237,11 +318,11 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                 { value: '0', label: 'No' }
             ]
         },
-        {
+        ...(hasAdvancedView ? [{
             key: 'is_prepared_date',
             title: 'Data Preparazione',
             type: 'daterange' as const
-        },
+        }] : []),
         {
             key: 'is_loaded',
             title: 'Caricata',
@@ -251,11 +332,11 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                 { value: '0', label: 'No' }
             ]
         },
-        {
+        ...(hasAdvancedView ? [{
             key: 'is_loaded_date',
             title: 'Data Caricamento',
             type: 'daterange' as const
-        },
+        }] : []),
         {
             key: 'is_delivered',
             title: 'Consegnata',
@@ -265,15 +346,15 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                 { value: '0', label: 'No' }
             ]
         },
-        {
+        ...(hasAdvancedView ? [{
             key: 'is_delivered_date',
             title: 'Data Consegna',
             type: 'daterange' as const
-        }
+        }] : [])
     ];
 
     const actions = [
-        ({ row }: { row: any }) => <ViewAction row={row} />,
+        ({ row }: { row: any }) => <ViewAction row={row} onView={handleView} />,
         ...(showEditActions ? [({ row }: { row: any }) => <EditAction row={row} onEdit={handleEdit} />] : []),
         ...(showDeleteActions ? [({ row }: { row: any }) => (
             <Can permission="delivery:delete">

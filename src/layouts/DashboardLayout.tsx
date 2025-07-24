@@ -52,7 +52,7 @@ const DashboardLayout: React.FC = () => {
     };
 
     return (
-        <div className="flex min-h-screen bg-gray-100 flex-col md:flex-row">
+        <div className="flex min-h-screen bg-background-100 flex-col md:flex-row">
             {/* Overlay con effetto blur per chiudere sidebar su mobile */}
             {sidebarOpen && window.innerWidth < 768 && (
                 <div

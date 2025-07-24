@@ -12,7 +12,7 @@ const ViewAction: React.FC<ViewActionProps> = ({ row, onView }) => {
     return (
         <ActionCell
             icon={
-                <div className="bg-blue-600 md:bg-transparent hover:bg-blue-700 md:hover:bg-transparent text-white md:text-blue-600 px-3 md:px-0 py-1 md:py-0 rounded-md md:rounded-none text-sm font-medium flex items-center gap-2">
+                <div className="bg-primary md:bg-transparent hover:bg-blue-700 md:hover:bg-transparent text-white md:text-blue-600 px-3 md:px-0 py-1 md:py-0 rounded-md md:rounded-none text-sm font-medium flex items-center gap-2">
                     <FontAwesomeIcon icon={faEye} size="sm" />
                     <span className="md:hidden">Apri</span>
                 </div>

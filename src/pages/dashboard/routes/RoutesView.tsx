@@ -62,7 +62,7 @@ const RoutesView: React.FC = () => {
                 actions={
                     <button
                         onClick={handleDeactivate}
-                        className="bg-amber-500 hover:bg-amber-700 text-white font-bold py-1.5 px-3 sm:py-2 sm:px-4 text-sm sm:text-base rounded"
+                        className="bg-background-800 hover:bg-amber-700 text-white font-bold py-1.5 px-3 sm:py-2 sm:px-4 text-sm sm:text-base rounded"
                         disabled={loading || !route}
                     >
                         Disattiva Rotta

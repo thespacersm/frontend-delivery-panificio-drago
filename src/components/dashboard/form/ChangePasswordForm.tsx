@@ -70,7 +70,7 @@ const ChangePasswordForm: React.FC = () => {
             <div className="mt-6">
                 <button
                     type="submit"
-                    className={`bg-primary hover:bg-primary-700 cursor-pointer text-white font-medium py-2 px-4 rounded-md ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`bg-primary hover:bg-primary cursor-pointer text-white font-medium py-2 px-4 rounded-md ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     disabled={isLoading}
                 >
                     {isLoading ? 'Salvataggio...' : 'Aggiorna Password'}

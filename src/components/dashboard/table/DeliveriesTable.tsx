@@ -77,7 +77,8 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                     is_delivered_date: delivery.acf.is_delivered_date,
                     zone_name: delivery.acf.zone_name,
                     carrier_name: delivery.acf.carrier_name,
-                    vehicle_name: delivery.acf.vehicle_name
+                    vehicle_name: delivery.acf.vehicle_name,
+                    weighted_qty: delivery.acf.weighted_qty
                 }
             });
 
@@ -181,6 +182,17 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
     const columns = [
         { key: 'id', title: 'ID', dataType: DataType.Number },
         {
+            key: 'date', title: 'Data', width: 100, render: (value: string) => (
+                <div className="text-sm">
+                    {new Date(value).toLocaleDateString('it-IT', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit'
+                    })}
+                </div>
+            )
+        },
+        {
             key: 'title', title: 'Cliente', render: (_value: any, row: any) => {
                 return (
                     <div>
@@ -196,10 +208,11 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                 )
             }
         },
-        { key: 'zone_name', title: 'Zona', dataType: DataType.String },
+        /* { key: 'zone_name', title: 'Zona', dataType: DataType.String }, */
         ...(hasAdvancedView ? [
             { key: 'carrier_name', title: 'Trasportatore', dataType: DataType.String },
             { key: 'vehicle_name', title: 'Veicolo', dataType: DataType.String },
+            { key: 'weighted_qty', title: 'Peso', dataType: DataType.Number },
         ] : []),
         {
             key: 'is_prepared', title: 'Preparata', width: 120, dataType: DataType.Boolean, render: (value: boolean, row: any) => (
@@ -288,6 +301,11 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
             type: 'number' as const
         },
         {
+            key: 'date',
+            title: 'Data',
+            type: 'daterange' as const
+        },
+        {
             key: 'title',
             title: 'Cliente',
             type: 'text' as const
@@ -307,6 +325,11 @@ const DeliveriesTable: React.FC<DeliveriesTableProps> = ({
                 key: 'vehicle_name',
                 title: 'Veicolo',
                 type: 'text' as const
+            },
+            {
+                key: 'weighted_qty',
+                title: 'Quantità Pesata',
+                type: 'number' as const
             },
         ] : []),
         {

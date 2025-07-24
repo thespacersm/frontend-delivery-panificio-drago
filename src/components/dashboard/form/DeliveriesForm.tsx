@@ -117,7 +117,7 @@ const DeliveriesForm: React.FC<DeliveriesFormProps> = ({delivery, onSubmit, isSu
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="bg-primary hover:bg-primary-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                    className="bg-primary hover:bg-primary text-white font-bold py-2 px-4 rounded disabled:opacity-50"
                 >
                     {isSubmitting ? 'Salvando...' : 'Salva'}
                 </button>

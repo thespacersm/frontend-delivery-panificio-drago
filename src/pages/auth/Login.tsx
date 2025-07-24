@@ -30,13 +30,13 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4 py-16 pt-0">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-background-100 px-4 py-16 pt-0">
             <img 
-                src="/logo.svg" 
+                src="/logo-h.png" 
                 alt="Panificio Drago Logo" 
-                className="h-20 w-20 mb-4"
+                className="h-20 w-auto mb-4"
             />
-            <div className="w-full max-w-md p-6 space-y-4 bg-white rounded shadow-md">
+            <div className="w-full max-w-md p-6 space-y-4 bg-boxwhite-100 rounded shadow-md">
                 <div className="flex flex-col items-center justify-center">
                     <h1 className="text-xl font-bold text-center text-gray-800">Login</h1>
                 </div>
@@ -80,7 +80,7 @@ const Login: React.FC = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-indigo-300"
+                        className="w-full px-4 py-2 text-white bg-primary rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-primary-300"
                     >
                         {isLoading ? 'Accesso in corso...' : 'Accedi'}
                     </button>

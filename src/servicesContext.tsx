@@ -18,6 +18,8 @@ import FlottaInCloudService from './services/FlottaInCloudService';
 import RouteService from './services/RouteService';
 import DeliveryService from './services/DeliveryService';
 import MediaService from './services/MediaService';
+import MapClient from './clients/MapClient';
+import MapService from './services/MapService';
 
 // Create the context
 const ServicesContext = createContext<{
@@ -31,6 +33,7 @@ const ServicesContext = createContext<{
     deliveryService: DeliveryService;
     mediaService: MediaService;
     wpClient: WpClient;
+    mapService: MapService; // aggiungi mapService
 } | null>(null);
 
 // Create a provider component
@@ -52,6 +55,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({child
     const deliveryClient = new DeliveryClient(wpClient);
     const mediaClient = new MediaClient(wpClient);
     const flottaInCloudClient = new FlottaInCloudClient(flottaInCloudBaseUrl, flottaInCloudUsername, flottaInCloudToken);
+    const mapClient = new MapClient(wpClient);
 
     const authService = new AuthService(authClient);
     const userService = new UserService(userClient);
@@ -62,6 +66,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({child
     const routeService = new RouteService(routeClient);
     const deliveryService = new DeliveryService(deliveryClient);
     const mediaService = new MediaService(mediaClient);
+    const mapService = new MapService(mapClient);
 
     // Provide the services via context
     return (
@@ -75,7 +80,8 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({child
             routeService,
             deliveryService,
             mediaService,
-            wpClient
+            wpClient,
+            mapService // aggiungi mapService
         }}>
             {children}
         </ServicesContext.Provider>

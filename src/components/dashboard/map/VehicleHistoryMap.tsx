@@ -6,6 +6,8 @@ import {splitPositionsIntoRouteSegments} from '@/utils/routeUtils';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import FlottaInCloudPosition from '@/types/flottaincloud/FlottaInCloudPosition';
+import MapNearGeoRequest from '@/types/nearmap/MapNearGeoRequest';
+import MapNearGeoResponse from '@/types/nearmap/MapNearGeoResponse';
 
 // Risolve il problema delle icone mancanti in Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -22,12 +24,14 @@ interface VehicleHistoryMapProps {
 
 
 const VehicleHistoryMap: React.FC<VehicleHistoryMapProps> = ({imei}) => {
-    const {flottaInCloudService} = useServices();
+    const {flottaInCloudService, mapService} = useServices();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [positions, setPositions] = useState<FlottaInCloudPosition[]>([]);
     // Stato per memorizzare i segmenti di percorso separati
     const [routeSegments, setRouteSegments] = useState<Array<[number, number][]>>([]);
+    // Stato per memorizzare l'indice dei clienti
+    const [clientIndex, setClientIndex] = useState<Record<string, string>>({});
 
     // Stati per il form - unificati data e ora
     const [startDateTime, setStartDateTime] = useState<string>('');
@@ -69,6 +73,50 @@ const VehicleHistoryMap: React.FC<VehicleHistoryMapProps> = ({imei}) => {
         return true;
     };
 
+    // Funzione per creare la chiave dall'indice lat+lng
+    const createLocationKey = (lat: number, lng: number): string => {
+        return `${lat}_${lng}`;
+    };
+
+    // Funzione per recuperare le informazioni sui clienti
+    const fetchClientInfo = async (positions: FlottaInCloudPosition[]) => {
+        try {
+            // Raccoglie tutte le coordinate
+            const coordinates = positions.map(position => ({
+                latitude: position.lat,
+                longitude: position.lng
+            }));
+
+            // Crea la richiesta per il MapService
+            const request: MapNearGeoRequest = {
+                coordinates: coordinates
+            };
+
+            // Chiama il MapService
+            const response: MapNearGeoResponse = await mapService.mapNearGeo(request);
+
+            // Crea l'indice dei clienti
+            const newClientIndex: Record<string, string> = {};
+            
+            if (response.points_with_customers && Array.isArray(response.points_with_customers)) {
+                response.points_with_customers.forEach((result) => {
+                    if (result.nearest_customer) {
+                        const key = createLocationKey(
+                            result.point.latitude,
+                            result.point.longitude
+                        );
+                        newClientIndex[key] = result.nearest_customer.customer_name;
+                    }
+                });
+            }
+
+            setClientIndex(newClientIndex);
+        } catch (err) {
+            console.error('Errore durante il recupero delle informazioni sui clienti:', err);
+            // Non impostiamo un errore generale per non bloccare la visualizzazione della mappa
+        }
+    };
+
     // Funzione per recuperare lo storico delle posizioni
     const fetchHistoryPositions = async () => {
         if (!validateForm() || !imei) return;
@@ -95,6 +143,9 @@ const VehicleHistoryMap: React.FC<VehicleHistoryMapProps> = ({imei}) => {
             }
 
             const filteredPositions = positionsData;
+            
+            // Recupera le informazioni sui clienti per le posizioni filtrate
+            await fetchClientInfo(filteredPositions);
 
             setPositions(filteredPositions);
 
@@ -109,6 +160,7 @@ const VehicleHistoryMap: React.FC<VehicleHistoryMapProps> = ({imei}) => {
                 setRouteSegments(segments);
                 setError(null);
                 setShowMap(true);
+
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Si è verificato un errore durante il recupero dello storico delle posizioni');
@@ -178,7 +230,7 @@ const VehicleHistoryMap: React.FC<VehicleHistoryMapProps> = ({imei}) => {
 
                 <div className="flex items-center justify-center mt-4">
                     <button
-                        className="hover:bg-primary-700 cursor-pointer text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className="bg-primary hover:bg-primary cursor-pointer text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         type="button"
                         onClick={fetchHistoryPositions}
                         disabled={isLoading}
@@ -234,30 +286,41 @@ const VehicleHistoryMap: React.FC<VehicleHistoryMapProps> = ({imei}) => {
                                 </Polyline>
                             ))}
 
-                            {/* Aggiungi marker solo per le posizioni con type diverso da 1 */}
+                            {/* Aggiungi marker solo per le posizioni con type diverso da 1 e con cliente */}
                             {positions
                                 .filter(position => (position.type || 1) !== 1)
-                                .map((position, index) => (
-                                    <Marker
-                                        key={index}
-                                        position={[position.lat, position.lng]}
-                                    >
-                                        <Popup>
-                                            <div>
-                                                <p>
-                                                    <strong>Data:</strong> {new Date(position.timestamp).toLocaleString()}
-                                                </p>
-                                                <p>
-                                                    <strong>Tipo:</strong> {getPositionTypeDescription(position.type || 1)}
-                                                </p>
-                                                <p><strong>Velocità:</strong> {position.speed || 0} km/h</p>
-                                                <p>
-                                                    <strong>Coordinate:</strong> {position.lat.toFixed(6)}, {position.lng.toFixed(6)}
-                                                </p>
-                                            </div>
-                                        </Popup>
-                                    </Marker>
-                                ))}
+                                .map((position, index) => {
+                                    const locationKey = createLocationKey(position.lat, position.lng);
+                                    const clientName = clientIndex[locationKey];
+                                    
+                                    // Mostra il marker solo se c'è un cliente
+                                    if (!clientName || clientName.trim() === '') {
+                                        return null;
+                                    }
+                                     
+                                     return (
+                                         <Marker
+                                             key={index}
+                                             position={[position.lat, position.lng]}
+                                         >
+                                             <Popup>
+                                                 <div>
+                                                     <p>
+                                                         <strong>Data:</strong> {new Date(position.timestamp).toLocaleString()}
+                                                     </p>
+                                                     <p>
+                                                         <strong>Tipo:</strong> {getPositionTypeDescription(position.type || 1)}
+                                                     </p>
+                                                     <p><strong>Velocità:</strong> {position.speed || 0} km/h</p>
+                                                     <p>
+                                                         <strong>Coordinate:</strong> {position.lat.toFixed(6)}, {position.lng.toFixed(6)}
+                                                     </p>
+                                                     <p><strong>Cliente:</strong> {clientName}</p>
+                                                 </div>
+                                             </Popup>
+                                         </Marker>
+                                     );
+                                 })}
                         </MapContainer>
                     </div>
                 </>

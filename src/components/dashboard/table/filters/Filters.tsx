@@ -102,7 +102,7 @@ const Filters: React.FC<FiltersProps> = ({
             {/* Toggle button per mobile */}
             <button
                 onClick={() => setShowMobileFilters(!showMobileFilters)}
-                className="lg:hidden flex items-center gap-2 px-3 py-2 mb-3 bg-gray-200 text-gray-600 text-sm rounded-full hover:bg-gray-300 transition-colors w-fit shadow-sm border border-gray-300"
+                className="lg:hidden flex items-center gap-2 px-3 py-2 mb-3 bg-primary-50 text-gray-600 text-sm rounded-full hover:bg-gray-300 transition-colors w-fit shadow-sm border border-primary-300"
             >
                 <FontAwesomeIcon icon={faBars} className="text-xs" />
                 <span className="font-medium">Filtri</span>
@@ -171,7 +171,7 @@ const Filters: React.FC<FiltersProps> = ({
 
                 <button
                     onClick={applyFilters}
-                    className="px-4 py-2 bg-black text-white text-xs rounded-md hover:bg-primary-700 cursor-pointer transition-colors w-full sm:w-auto"
+                    className="px-4 py-2 bg-primary text-white text-xs rounded-md hover:bg-primary-700 cursor-pointer transition-colors w-full sm:w-auto"
                 >
                     Filtra
                 </button>

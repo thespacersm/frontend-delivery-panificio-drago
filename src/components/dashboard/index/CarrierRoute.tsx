@@ -43,7 +43,7 @@ const CarrierRoute: React.FC = () => {
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2 text-blue-600" />
+                        <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2 text-primary" />
                         Percorso di Consegna
                     </h3>
                     {activeRoute ? (
@@ -53,7 +53,7 @@ const CarrierRoute: React.FC = () => {
                             </p>
                             <Link
                                 to="/dashboard/routes/current"
-                                className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
+                                className="inline-flex items-center px-4 py-2 bg-primary hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
                             >
                                 <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
                                 Vai al percorso

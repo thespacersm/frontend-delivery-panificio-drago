@@ -6,7 +6,9 @@
 @config "../tailwind.config.js";
 
 
-
+.ka-row {
+    background-color: #FEFDF6 !important;
+}
 
 .ka-icon-sort svg {
     display: inline;
